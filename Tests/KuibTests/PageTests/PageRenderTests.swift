@@ -6,15 +6,15 @@
 import Testing
 import Elementary
 @testable import Components
+@testable import Database
 @testable import Models
 @testable import Pages
 
 @Suite("Page Rendering Tests")
 struct PageRenderTests {
 
-    // Helper to render HTML to string
+    // Helper to render HTML to string using Elementary's rendering API
     func render(_ html: some HTML) -> String {
-        // Elementary provides render() on HTML types
         var result = ""
         html.render(into: &result)
         return result

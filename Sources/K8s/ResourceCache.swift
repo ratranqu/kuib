@@ -24,7 +24,7 @@ import Foundation
 import Models
 
 /// Events emitted when the cache is updated.
-public enum CacheEvent: Sendable {
+public enum CacheEvent: Sendable, Equatable {
     case podsUpdated
     case deploymentsUpdated
     case jobsUpdated

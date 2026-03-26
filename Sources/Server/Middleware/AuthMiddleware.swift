@@ -4,6 +4,7 @@
 /// `X-Forwarded-User` and `X-Forwarded-Email` headers after successful
 /// authentication. This middleware extracts those for logging and display.
 
+import HTTPTypes
 import Hummingbird
 import Logging
 
@@ -20,8 +21,8 @@ public struct AuthMiddleware<Context: RequestContext>: RouterMiddleware {
         context: Context,
         next: (Request, Context) async throws -> Response
     ) async throws -> Response {
-        let user = request.headers[.init("X-Forwarded-User")!]
-        let email = request.headers[.init("X-Forwarded-Email")!]
+        let user: String? = HTTPField.Name("X-Forwarded-User").flatMap { request.headers[$0] }
+        let email: String? = HTTPField.Name("X-Forwarded-Email").flatMap { request.headers[$0] }
 
         if let user {
             context.logger.info("Request from user: \(user) (\(email ?? "no email"))")

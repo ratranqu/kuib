@@ -2,6 +2,7 @@
 
 import Alerts
 import Database
+import HTTPTypes
 import Hummingbird
 import K8s
 import Models
@@ -35,13 +36,13 @@ public func registerAPIRoutes(
                 .replacingOccurrences(of: ">", with: "&gt;")
             return Response(
                 status: .ok,
-                headers: [.contentType: "text/html"],
+                headers: HTTPFields([HTTPField(name: .contentType, value: "text/html")]),
                 body: .init(byteBuffer: .init(string: "<pre>\(escaped)</pre>"))
             )
         } catch {
             return Response(
                 status: .internalServerError,
-                headers: [.contentType: "text/html"],
+                headers: HTTPFields([HTTPField(name: .contentType, value: "text/html")]),
                 body: .init(byteBuffer: .init(string: "<p class=\"text-red-500\">Error loading logs: \(error)</p>"))
             )
         }
@@ -57,7 +58,10 @@ public func registerAPIRoutes(
             try await k8sClient.deletePod(namespace: ns, name: name)
             return Response(
                 status: .ok,
-                headers: [.contentType: "text/html", "HX-Redirect": "/pods"],
+                headers: HTTPFields([
+                    HTTPField(name: .contentType, value: "text/html"),
+                    HTTPField(name: HTTPField.Name("HX-Redirect")!, value: "/pods"),
+                ]),
                 body: .init(byteBuffer: .init(string: "Pod deleted"))
             )
         } catch {
@@ -83,7 +87,7 @@ public func registerAPIRoutes(
             try await k8sClient.scaleDeployment(namespace: ns, name: name, replicas: replicas)
             return Response(
                 status: .ok,
-                headers: [.contentType: "text/html"],
+                headers: HTTPFields([HTTPField(name: .contentType, value: "text/html")]),
                 body: .init(byteBuffer: .init(string: "Scaled to \(replicas) replicas"))
             )
         } catch {
@@ -111,7 +115,7 @@ public func registerAPIRoutes(
 
         return Response(
             status: .ok,
-            headers: [.contentType: "text/html"],
+            headers: HTTPFields([HTTPField(name: .contentType, value: "text/html")]),
             body: .init(byteBuffer: .init(string: html))
         )
     }
@@ -130,7 +134,7 @@ public func registerAPIRoutes(
 
         return Response(
             status: .ok,
-            headers: [.contentType: "application/json"],
+            headers: HTTPFields([HTTPField(name: .contentType, value: "application/json")]),
             body: .init(byteBuffer: .init(data: data))
         )
     }
@@ -140,7 +144,7 @@ public func registerAPIRoutes(
     api.get("health") { _, _ -> Response in
         Response(
             status: .ok,
-            headers: [.contentType: "application/json"],
+            headers: HTTPFields([HTTPField(name: .contentType, value: "application/json")]),
             body: .init(byteBuffer: .init(string: "{\"status\":\"ok\"}"))
         )
     }
@@ -148,7 +152,7 @@ public func registerAPIRoutes(
     api.get("ready") { _, _ -> Response in
         Response(
             status: .ok,
-            headers: [.contentType: "application/json"],
+            headers: HTTPFields([HTTPField(name: .contentType, value: "application/json")]),
             body: .init(byteBuffer: .init(string: "{\"ready\":true}"))
         )
     }
@@ -180,7 +184,7 @@ public func registerAPIRoutes(
         let data = try encoder.encode(entries)
         return Response(
             status: .ok,
-            headers: [.contentType: "application/json"],
+            headers: HTTPFields([HTTPField(name: .contentType, value: "application/json")]),
             body: .init(byteBuffer: .init(data: data))
         )
     }
@@ -198,7 +202,7 @@ public func registerAPIRoutes(
 
         return Response(
             status: .ok,
-            headers: [.contentType: "application/json"],
+            headers: HTTPFields([HTTPField(name: .contentType, value: "application/json")]),
             body: .init(byteBuffer: .init(data: data))
         )
     }

@@ -69,6 +69,7 @@ let package = Package(
             name: "Pages",
             dependencies: [
                 "Components",
+                "Database",
                 "Models",
                 .product(name: "Elementary", package: "elementary"),
                 .product(name: "ElementaryHTMX", package: "elementary-htmx"),
@@ -95,6 +96,7 @@ let package = Package(
             dependencies: [
                 "Models",
                 .product(name: "SwiftkubeClient", package: "client"),
+                .product(name: "SwiftkubeModel", package: "client"),
                 .product(name: "Logging", package: "swift-log"),
             ],
             path: "Sources/K8s"

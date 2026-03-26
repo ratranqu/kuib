@@ -121,13 +121,60 @@ public actor DatabaseManager {
     ) async throws -> [EventInfo] {
         guard let conn = connection else { throw DatabaseError.notConnected }
 
-        var sql = "SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count FROM k8s_events WHERE 1=1"
-        if let ns = namespace { sql += " AND namespace = '\(ns)'" }
-        if let r = reason { sql += " AND reason = '\(r)'" }
-        if let kind = objectKind { sql += " AND involved_object_kind = '\(kind)'" }
-        sql += " ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)"
+        // Build parameterized query to prevent SQL injection
+        let query: PostgresQuery
+        switch (namespace, reason, objectKind) {
+        case let (ns?, r?, kind?):
+            query = """
+                SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count
+                FROM k8s_events WHERE namespace = \(ns) AND reason = \(r) AND involved_object_kind = \(kind)
+                ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)
+                """
+        case let (ns?, r?, nil):
+            query = """
+                SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count
+                FROM k8s_events WHERE namespace = \(ns) AND reason = \(r)
+                ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)
+                """
+        case let (ns?, nil, kind?):
+            query = """
+                SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count
+                FROM k8s_events WHERE namespace = \(ns) AND involved_object_kind = \(kind)
+                ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)
+                """
+        case let (nil, r?, kind?):
+            query = """
+                SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count
+                FROM k8s_events WHERE reason = \(r) AND involved_object_kind = \(kind)
+                ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)
+                """
+        case let (ns?, nil, nil):
+            query = """
+                SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count
+                FROM k8s_events WHERE namespace = \(ns)
+                ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)
+                """
+        case let (nil, r?, nil):
+            query = """
+                SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count
+                FROM k8s_events WHERE reason = \(r)
+                ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)
+                """
+        case let (nil, nil, kind?):
+            query = """
+                SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count
+                FROM k8s_events WHERE involved_object_kind = \(kind)
+                ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)
+                """
+        case (nil, nil, nil):
+            query = """
+                SELECT id, namespace, involved_object_kind, involved_object_name, reason, message, type, first_timestamp, last_timestamp, count
+                FROM k8s_events
+                ORDER BY last_timestamp DESC LIMIT \(limit) OFFSET \(offset)
+                """
+        }
 
-        let rows = try await conn.query(PostgresQuery(stringLiteral: sql), logger: logger)
+        let rows = try await conn.query(query, logger: logger)
         var events: [EventInfo] = []
         for try await row in rows {
             let (id, ns, kind, name, reason, message, type, first, last, count) =
@@ -203,12 +250,36 @@ public actor DatabaseManager {
     ) async throws -> [JobRunRecord] {
         guard let conn = connection else { throw DatabaseError.notConnected }
 
-        var sql = "SELECT id, namespace, job_name, owner_name, status, start_time, completion_time, duration_seconds FROM job_runs WHERE 1=1"
-        if let ns = namespace { sql += " AND namespace = '\(ns)'" }
-        if let owner = cronJobName { sql += " AND owner_name = '\(owner)'" }
-        sql += " ORDER BY start_time DESC LIMIT \(limit)"
+        // Use parameterized queries to prevent SQL injection
+        let query: PostgresQuery
+        switch (namespace, cronJobName) {
+        case let (ns?, owner?):
+            query = """
+                SELECT id, namespace, job_name, owner_name, status, start_time, completion_time, duration_seconds
+                FROM job_runs WHERE namespace = \(ns) AND owner_name = \(owner)
+                ORDER BY start_time DESC LIMIT \(limit)
+                """
+        case let (ns?, nil):
+            query = """
+                SELECT id, namespace, job_name, owner_name, status, start_time, completion_time, duration_seconds
+                FROM job_runs WHERE namespace = \(ns)
+                ORDER BY start_time DESC LIMIT \(limit)
+                """
+        case let (nil, owner?):
+            query = """
+                SELECT id, namespace, job_name, owner_name, status, start_time, completion_time, duration_seconds
+                FROM job_runs WHERE owner_name = \(owner)
+                ORDER BY start_time DESC LIMIT \(limit)
+                """
+        case (nil, nil):
+            query = """
+                SELECT id, namespace, job_name, owner_name, status, start_time, completion_time, duration_seconds
+                FROM job_runs
+                ORDER BY start_time DESC LIMIT \(limit)
+                """
+        }
 
-        let rows = try await conn.query(PostgresQuery(stringLiteral: sql), logger: logger)
+        let rows = try await conn.query(query, logger: logger)
         var results: [JobRunRecord] = []
         for try await row in rows {
             let (id, ns, name, owner, status, start, completion, duration) =

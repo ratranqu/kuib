@@ -7,8 +7,7 @@ import Models
 // MARK: - ConfigMap List
 
 /// Page listing all ConfigMaps.
-public struct ConfigMapListPage: HTMLDocument {
-    public var title: String = "KUIB - ConfigMaps"
+public struct ConfigMapListPage: HTML {
     let configMaps: [ConfigMapInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -19,9 +18,7 @@ public struct ConfigMapListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "ConfigMaps", currentPath: "/configmaps") {
             PageHeader(title: "ConfigMaps", subtitle: "\(configMaps.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/configmaps/list")
@@ -63,8 +60,7 @@ public struct ConfigMapListPage: HTMLDocument {
 // MARK: - Secret List
 
 /// Page listing all Secrets (metadata only).
-public struct SecretListPage: HTMLDocument {
-    public var title: String = "KUIB - Secrets"
+public struct SecretListPage: HTML {
     let secrets: [SecretInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -75,9 +71,7 @@ public struct SecretListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Secrets", currentPath: "/secrets") {
             PageHeader(title: "Secrets", subtitle: "\(secrets.count) total (metadata only)") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/secrets/list")
@@ -112,8 +106,7 @@ public struct SecretListPage: HTMLDocument {
 // MARK: - PVC List
 
 /// Page listing all PersistentVolumeClaims.
-public struct PVCListPage: HTMLDocument {
-    public var title: String = "KUIB - PVCs"
+public struct PVCListPage: HTML {
     let pvcs: [PVCInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -124,9 +117,7 @@ public struct PVCListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "PVCs", currentPath: "/pvcs") {
             PageHeader(title: "Persistent Volume Claims", subtitle: "\(pvcs.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/pvcs/list")

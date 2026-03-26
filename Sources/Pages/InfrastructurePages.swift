@@ -8,17 +8,14 @@ import Models
 // MARK: - Node List
 
 /// Page listing all Nodes.
-public struct NodeListPage: HTMLDocument {
-    public var title: String = "KUIB - Nodes"
+public struct NodeListPage: HTML {
     let nodes: [NodeInfo]
 
     public init(nodes: [NodeInfo]) {
         self.nodes = nodes
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Nodes", currentPath: "/nodes") {
             PageHeader(title: "Nodes", subtitle: "\(nodes.count) total")
 
@@ -61,20 +58,16 @@ public struct NodeListPage: HTMLDocument {
 }
 
 /// Detail page for a single Node.
-public struct NodeDetailPage: HTMLDocument {
-    public var title: String
+public struct NodeDetailPage: HTML {
     let node: NodeInfo
     let pods: [PodInfo]
 
     public init(node: NodeInfo, pods: [PodInfo] = []) {
-        self.title = "KUIB - Node: \(node.name)"
         self.node = node
         self.pods = pods
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Node: \(node.name)", currentPath: "/nodes") {
             nav(.class("flex items-center space-x-2 text-sm text-gray-500 mb-4")) {
                 a(.href("/nodes"), .class("hover:text-blue-600")) { "Nodes" }
@@ -134,8 +127,7 @@ public struct NodeDetailPage: HTMLDocument {
 // MARK: - Events Page
 
 /// Page showing cluster-wide event stream with search and filtering.
-public struct EventsPage: HTMLDocument {
-    public var title: String = "KUIB - Events"
+public struct EventsPage: HTML {
     let events: [EventInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -148,9 +140,7 @@ public struct EventsPage: HTMLDocument {
         self.filterReason = filterReason
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Events", currentPath: "/events") {
             PageHeader(title: "Events", subtitle: "\(events.count) events") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/events/list")

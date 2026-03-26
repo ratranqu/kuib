@@ -7,8 +7,7 @@ import Models
 // MARK: - Alert History
 
 /// Page showing fired alert history.
-public struct AlertHistoryPage: HTMLDocument {
-    public var title: String = "KUIB - Alerts"
+public struct AlertHistoryPage: HTML {
     let alerts: [FiredAlert]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -19,9 +18,7 @@ public struct AlertHistoryPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Alerts", currentPath: "/alerts") {
             PageHeader(title: "Alert History", subtitle: "\(alerts.count) alerts") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/alerts/list")
@@ -70,17 +67,14 @@ public struct AlertHistoryPage: HTMLDocument {
 // MARK: - Alert Rules Page
 
 /// Page listing configured alert rules.
-public struct AlertRulesPage: HTMLDocument {
-    public var title: String = "KUIB - Alert Rules"
+public struct AlertRulesPage: HTML {
     let rules: [AlertRule]
 
     public init(rules: [AlertRule]) {
         self.rules = rules
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Alert Rules", currentPath: "/alerts/rules") {
             PageHeader(title: "Alert Rules", subtitle: "\(rules.count) rules configured")
 
@@ -122,17 +116,14 @@ public struct AlertRulesPage: HTMLDocument {
 // MARK: - Webhooks Page
 
 /// Page listing configured webhook endpoints.
-public struct WebhooksPage: HTMLDocument {
-    public var title: String = "KUIB - Webhooks"
+public struct WebhooksPage: HTML {
     let endpoints: [WebhookEndpoint]
 
     public init(endpoints: [WebhookEndpoint]) {
         self.endpoints = endpoints
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Webhooks", currentPath: "/alerts/webhooks") {
             PageHeader(title: "Webhook Endpoints", subtitle: "\(endpoints.count) configured")
 

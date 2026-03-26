@@ -7,8 +7,7 @@ import Models
 // MARK: - Service List
 
 /// Page listing all Services.
-public struct ServiceListPage: HTMLDocument {
-    public var title: String = "KUIB - Services"
+public struct ServiceListPage: HTML {
     let services: [ServiceInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -19,9 +18,7 @@ public struct ServiceListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Services", currentPath: "/services") {
             PageHeader(title: "Services", subtitle: "\(services.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/services/list")
@@ -66,8 +63,7 @@ public struct ServiceListPage: HTMLDocument {
 // MARK: - Ingress List
 
 /// Page listing all Ingresses.
-public struct IngressListPage: HTMLDocument {
-    public var title: String = "KUIB - Ingresses"
+public struct IngressListPage: HTML {
     let ingresses: [IngressInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -78,9 +74,7 @@ public struct IngressListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Ingresses", currentPath: "/ingresses") {
             PageHeader(title: "Ingresses", subtitle: "\(ingresses.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/ingresses/list")
