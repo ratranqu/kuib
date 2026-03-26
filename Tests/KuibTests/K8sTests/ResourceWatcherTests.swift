@@ -1,5 +1,6 @@
 /// Tests for the ResourceWatcher.
 
+import Foundation
 import Testing
 @testable import K8s
 @testable import Models

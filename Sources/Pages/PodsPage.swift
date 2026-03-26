@@ -8,6 +8,7 @@ import Components
 import Elementary
 import ElementaryHTMX
 import ElementaryHTMXSSE
+import Foundation
 import Models
 
 // MARK: - Pod List Page
@@ -24,7 +25,7 @@ public struct PodListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Pods", currentPath: "/pods") {
             PageHeader(title: "Pods", subtitle: "\(pods.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/pods/list")
@@ -45,7 +46,7 @@ public struct PodListPage: HTML {
 public struct PodListPartial: HTML {
     let pods: [PodInfo]
 
-    public var content: some HTML {
+    public var body: some HTML {
         if pods.isEmpty {
             EmptyState("No pods found")
         } else {
@@ -101,7 +102,7 @@ public struct PodDetailPage: HTML {
         self.events = events
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Pod: \(pod.name)", currentPath: "/pods") {
             // Breadcrumb
             nav(.class("flex items-center space-x-2 text-sm text-gray-500 mb-4")) {
@@ -214,7 +215,7 @@ public struct ContainerRow: HTML {
     let podNamespace: String
     let podName: String
 
-    public var content: some HTML {
+    public var body: some HTML {
         div(.class("px-6 py-4")) {
             div(.class("flex items-center justify-between")) {
                 div(.class("flex items-center space-x-3")) {
@@ -239,7 +240,7 @@ public struct ContainerRow: HTML {
 public struct ContainerStateBadge: HTML {
     let state: ContainerState
 
-    public var content: some HTML {
+    public var body: some HTML {
         switch state {
         case .running:
             span(.class("badge badge-healthy")) { "Running" }
@@ -260,7 +261,7 @@ public struct DetailRow: HTML {
     let label: String
     let value: String
 
-    public var content: some HTML {
+    public var body: some HTML {
         div(.class("flex justify-between")) {
             dt(.class("text-sm text-gray-500")) { label }
             dd(.class("text-sm text-gray-900")) { value }

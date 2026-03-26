@@ -15,7 +15,7 @@ public struct NodeListPage: HTML {
         self.nodes = nodes
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Nodes", currentPath: "/nodes") {
             PageHeader(title: "Nodes", subtitle: "\(nodes.count) total")
 
@@ -67,7 +67,7 @@ public struct NodeDetailPage: HTML {
         self.pods = pods
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Node: \(node.name)", currentPath: "/nodes") {
             nav(.class("flex items-center space-x-2 text-sm text-gray-500 mb-4")) {
                 a(.href("/nodes"), .class("hover:text-blue-600")) { "Nodes" }
@@ -140,7 +140,7 @@ public struct EventsPage: HTML {
         self.filterReason = filterReason
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Events", currentPath: "/events") {
             PageHeader(title: "Events", subtitle: "\(events.count) events") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/events/list")
@@ -188,7 +188,7 @@ public struct EventsPage: HTML {
 public struct EventsListPartial: HTML {
     let events: [EventInfo]
 
-    public var content: some HTML {
+    public var body: some HTML {
         if events.isEmpty {
             EmptyState("No events found")
         } else {

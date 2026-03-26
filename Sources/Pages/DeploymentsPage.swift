@@ -16,7 +16,7 @@ public struct DeploymentListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Deployments", currentPath: "/deployments") {
             PageHeader(title: "Deployments", subtitle: "\(deployments.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/deployments/list")
@@ -37,7 +37,7 @@ public struct DeploymentListPage: HTML {
 public struct DeploymentListPartial: HTML {
     let deployments: [DeploymentInfo]
 
-    public var content: some HTML {
+    public var body: some HTML {
         if deployments.isEmpty {
             EmptyState("No deployments found")
         } else {
@@ -85,7 +85,7 @@ public struct DeploymentDetailPage: HTML {
         self.events = events
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Deployment: \(deployment.name)", currentPath: "/deployments") {
             nav(.class("flex items-center space-x-2 text-sm text-gray-500 mb-4")) {
                 a(.href("/deployments"), .class("hover:text-blue-600")) { "Deployments" }

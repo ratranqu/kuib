@@ -18,7 +18,7 @@ public struct ServiceListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Services", currentPath: "/services") {
             PageHeader(title: "Services", subtitle: "\(services.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/services/list")
@@ -74,7 +74,7 @@ public struct IngressListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Ingresses", currentPath: "/ingresses") {
             PageHeader(title: "Ingresses", subtitle: "\(ingresses.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/ingresses/list")

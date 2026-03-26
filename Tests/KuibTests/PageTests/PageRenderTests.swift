@@ -3,6 +3,7 @@
 /// These tests verify that pages render valid HTML containing expected
 /// elements, status indicators, and resource data.
 
+import Foundation
 import Testing
 import Elementary
 @testable import Components
@@ -14,10 +15,8 @@ import Elementary
 struct PageRenderTests {
 
     // Helper to render HTML to string using Elementary's rendering API
-    func render(_ html: some HTML) -> String {
-        var result = ""
-        html.render(into: &result)
-        return result
+    func render(_ html: consuming some HTML) -> String {
+        html.render()
     }
 
     @Test("Dashboard stats render with correct counts")

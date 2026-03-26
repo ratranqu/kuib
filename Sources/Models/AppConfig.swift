@@ -108,11 +108,11 @@ public struct RetentionConfig: Sendable {
 
 // MARK: - Environment Helpers
 
-func env(_ key: String, default defaultValue: String) -> String {
+public func env(_ key: String, default defaultValue: String) -> String {
     ProcessInfo.processInfo.environment[key] ?? defaultValue
 }
 
-func envInt(_ key: String, default defaultValue: Int) -> Int {
+public func envInt(_ key: String, default defaultValue: Int) -> Int {
     if let value = ProcessInfo.processInfo.environment[key], let intValue = Int(value) {
         return intValue
     }

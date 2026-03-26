@@ -3,6 +3,7 @@
 import Components
 import Database
 import Elementary
+import Foundation
 import Models
 
 // MARK: - Jobs List
@@ -19,7 +20,7 @@ public struct JobListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Jobs", currentPath: "/jobs") {
             PageHeader(title: "Jobs", subtitle: "\(jobs.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/jobs/list")
@@ -36,7 +37,7 @@ public struct JobListPage: HTML {
 public struct JobListPartial: HTML {
     let jobs: [JobInfo]
 
-    public var content: some HTML {
+    public var body: some HTML {
         if jobs.isEmpty {
             EmptyState("No jobs found")
         } else {
@@ -92,7 +93,7 @@ public struct JobDetailPage: HTML {
         self.history = history
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Job: \(job.name)", currentPath: "/jobs") {
             nav(.class("flex items-center space-x-2 text-sm text-gray-500 mb-4")) {
                 a(.href("/jobs"), .class("hover:text-blue-600")) { "Jobs" }
@@ -161,7 +162,7 @@ public struct CronJobListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "CronJobs", currentPath: "/cronjobs") {
             PageHeader(title: "CronJobs", subtitle: "\(cronJobs.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/cronjobs/list")
@@ -213,31 +214,34 @@ public struct CronJobListPage: HTML {
 public struct JobTimeline: HTML {
     let history: [JobRunRecord]
 
-    public var content: some HTML {
+    private static func bgColor(for status: String) -> String {
+        switch status {
+        case "succeeded": return "bg-green-500"
+        case "failed": return "bg-red-500"
+        default: return "bg-yellow-500"
+        }
+    }
+
+    private static func barHeight(for duration: Double?) -> String {
+        guard let duration else { return "16px" }
+        let maxHeight = 80.0
+        let minHeight = 8.0
+        let normalized = min(max(duration / 300.0, 0), 1)
+        let h = minHeight + (maxHeight - minHeight) * normalized
+        return "\(Int(h))px"
+    }
+
+    private static func barTitle(for run: JobRunRecord) -> String {
+        "\(run.jobName): \(run.status)\(run.durationSeconds.map { " (\(formatDuration($0)))" } ?? "")"
+    }
+
+    public var body: some HTML {
         div(.class("flex items-end space-x-1 h-24")) {
             for run in history.suffix(30).reversed() {
-                let bgColor: String
-                switch run.status {
-                case "succeeded": bgColor = "bg-green-500"
-                case "failed": bgColor = "bg-red-500"
-                default: bgColor = "bg-yellow-500"
-                }
-
-                let height: String
-                if let duration = run.durationSeconds {
-                    let maxHeight = 80.0
-                    let minHeight = 8.0
-                    let normalized = min(max(duration / 300.0, 0), 1) // normalize to 5min max
-                    let h = minHeight + (maxHeight - minHeight) * normalized
-                    height = "\(Int(h))px"
-                } else {
-                    height = "16px"
-                }
-
                 div(
-                    .class("\(bgColor) rounded-t cursor-pointer hover:opacity-80 transition-opacity"),
-                    .style("width: 12px; height: \(height);"),
-                    .attribute("title", value: "\(run.jobName): \(run.status)\(run.durationSeconds.map { " (\(formatDuration($0)))" } ?? "")")
+                    .class("\(Self.bgColor(for: run.status)) rounded-t cursor-pointer hover:opacity-80 transition-opacity"),
+                    .style("width: 12px; height: \(Self.barHeight(for: run.durationSeconds));"),
+                    .attribute("title", value: Self.barTitle(for: run))
                 ) {}
             }
         }

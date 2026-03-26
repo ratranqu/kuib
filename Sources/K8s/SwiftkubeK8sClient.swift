@@ -10,6 +10,11 @@ import Models
 import SwiftkubeClient
 import SwiftkubeModel
 
+/// Errors specific to SwiftkubeK8sClient.
+public enum SwiftkubeK8sClientError: Error {
+    case configurationNotFound
+}
+
 /// Production Kubernetes client backed by SwiftkubeClient.
 public final class SwiftkubeK8sClient: K8sClientProtocol, @unchecked Sendable {
     private let client: KubernetesClient
@@ -17,7 +22,10 @@ public final class SwiftkubeK8sClient: K8sClientProtocol, @unchecked Sendable {
 
     /// Creates a new client, auto-detecting in-cluster or kubeconfig authentication.
     public init(logger: Logger = Logger(label: "kuib.k8s")) throws {
-        self.client = try KubernetesClient()
+        guard let client = KubernetesClient() else {
+            throw SwiftkubeK8sClientError.configurationNotFound
+        }
+        self.client = client
         self.logger = logger
     }
 
@@ -29,7 +37,7 @@ public final class SwiftkubeK8sClient: K8sClientProtocol, @unchecked Sendable {
     // MARK: - Pods
 
     public func listPods(namespace: NamespaceSelector) async throws -> [PodInfo] {
-        let pods = try await client.pods.list(in: namespace.toSwiftkube())
+        let pods = try await client.pods.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return pods.items.map { pod in
             PodInfo(from: pod)
         }
@@ -41,21 +49,22 @@ public final class SwiftkubeK8sClient: K8sClientProtocol, @unchecked Sendable {
     }
 
     public func getPodLogs(namespace: String, name: String, container: String?, tailLines: Int?) async throws -> String {
-        let options = core.v1.PodLogOptions(
+        return try await client.pods.logs(
+            in: .namespace(namespace),
+            name: name,
             container: container,
-            tailLines: tailLines.map { Int64($0) }
+            tailLines: tailLines
         )
-        return try await client.pods.logs(in: .namespace(namespace), name: name, logOptions: options)
     }
 
     public func deletePod(namespace: String, name: String) async throws {
-        try await client.pods.delete(in: .namespace(namespace), name: name)
+        try await client.pods.delete(inNamespace: .namespace(namespace), name: name)
     }
 
     // MARK: - Deployments
 
     public func listDeployments(namespace: NamespaceSelector) async throws -> [DeploymentInfo] {
-        let deployments = try await client.appsV1.deployments.list(in: namespace.toSwiftkube())
+        let deployments = try await client.appsV1.deployments.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return deployments.items.map { DeploymentInfo(from: $0) }
     }
 
@@ -75,7 +84,7 @@ public final class SwiftkubeK8sClient: K8sClientProtocol, @unchecked Sendable {
     // MARK: - Jobs
 
     public func listJobs(namespace: NamespaceSelector) async throws -> [JobInfo] {
-        let jobs = try await client.batchV1.jobs.list(in: namespace.toSwiftkube())
+        let jobs = try await client.batchV1.jobs.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return jobs.items.map { JobInfo(from: $0) }
     }
 
@@ -85,41 +94,41 @@ public final class SwiftkubeK8sClient: K8sClientProtocol, @unchecked Sendable {
     }
 
     public func deleteJob(namespace: String, name: String) async throws {
-        try await client.batchV1.jobs.delete(in: .namespace(namespace), name: name)
+        try await client.batchV1.jobs.delete(inNamespace: .namespace(namespace), name: name)
     }
 
     // MARK: - CronJobs
 
     public func listCronJobs(namespace: NamespaceSelector) async throws -> [CronJobInfo] {
-        let cronJobs = try await client.batchV1.cronJobs.list(in: namespace.toSwiftkube())
+        let cronJobs = try await client.batchV1.cronJobs.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return cronJobs.items.map { CronJobInfo(from: $0) }
     }
 
     // MARK: - StatefulSets
 
     public func listStatefulSets(namespace: NamespaceSelector) async throws -> [StatefulSetInfo] {
-        let sets = try await client.appsV1.statefulSets.list(in: namespace.toSwiftkube())
+        let sets = try await client.appsV1.statefulSets.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return sets.items.map { StatefulSetInfo(from: $0) }
     }
 
     // MARK: - DaemonSets
 
     public func listDaemonSets(namespace: NamespaceSelector) async throws -> [DaemonSetInfo] {
-        let sets = try await client.appsV1.daemonSets.list(in: namespace.toSwiftkube())
+        let sets = try await client.appsV1.daemonSets.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return sets.items.map { DaemonSetInfo(from: $0) }
     }
 
     // MARK: - Services
 
     public func listServices(namespace: NamespaceSelector) async throws -> [ServiceInfo] {
-        let services = try await client.services.list(in: namespace.toSwiftkube())
+        let services = try await client.services.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return services.items.map { ServiceInfo(from: $0) }
     }
 
     // MARK: - Ingresses
 
     public func listIngresses(namespace: NamespaceSelector) async throws -> [IngressInfo] {
-        let ingresses = try await client.networkingV1.ingresses.list(in: namespace.toSwiftkube())
+        let ingresses = try await client.networkingV1.ingresses.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return ingresses.items.map { IngressInfo(from: $0) }
     }
 
@@ -133,7 +142,7 @@ public final class SwiftkubeK8sClient: K8sClientProtocol, @unchecked Sendable {
     // MARK: - Events
 
     public func listEvents(namespace: NamespaceSelector) async throws -> [EventInfo] {
-        let events = try await client.events.list(in: namespace.toSwiftkube())
+        let events = try await client.events.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return events.items.map { EventInfo(from: $0) }
     }
 
@@ -147,33 +156,23 @@ public final class SwiftkubeK8sClient: K8sClientProtocol, @unchecked Sendable {
     // MARK: - Config Resources
 
     public func listConfigMaps(namespace: NamespaceSelector) async throws -> [ConfigMapInfo] {
-        let cms = try await client.configMaps.list(in: namespace.toSwiftkube())
+        let cms = try await client.configMaps.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return cms.items.map { ConfigMapInfo(from: $0) }
     }
 
     public func listSecrets(namespace: NamespaceSelector) async throws -> [SecretInfo] {
-        let secrets = try await client.secrets.list(in: namespace.toSwiftkube())
+        let secrets = try await client.secrets.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return secrets.items.map { SecretInfo(from: $0) }
     }
 
     public func listPVCs(namespace: NamespaceSelector) async throws -> [PVCInfo] {
-        let pvcs = try await client.persistentVolumeClaims.list(in: namespace.toSwiftkube())
+        let pvcs = try await client.persistentVolumeClaims.list(in: namespace.namespaceName.map { .namespace($0) } ?? .allNamespaces)
         return pvcs.items.map { PVCInfo(from: $0) }
     }
 }
 
 // MARK: - Namespace Conversion
 
-extension NamespaceSelector {
-    func toSwiftkube() -> SwiftkubeModel.NamespaceSelector {
-        switch self {
-        case .all:
-            return .allNamespaces
-        case .namespace(let ns):
-            return .namespace(ns)
-        }
-    }
-}
 
 // MARK: - Model Conversions
 
@@ -390,22 +389,22 @@ extension DaemonSetInfo {
 }
 
 extension ServiceInfo {
+    private static func extractTargetPort(_ tp: IntOrString?, fallbackPort: Int32) -> String {
+        guard let tp else { return "\(fallbackPort)" }
+        if let data = try? JSONEncoder().encode(tp),
+           let strVal = try? JSONDecoder().decode(String.self, from: data) {
+            return strVal
+        }
+        return "\(fallbackPort)"
+    }
+
     init(from svc: core.v1.Service) {
-        let ports = (svc.spec?.ports ?? []).map { port in
-            let targetPortStr: String
-            if let tp = port.targetPort {
-                switch tp {
-                case .int(let value): targetPortStr = "\(value)"
-                case .string(let value): targetPortStr = value
-                }
-            } else {
-                targetPortStr = "\(port.port)"
-            }
-            return Models.ServicePort(
+        let ports: [Models.ServicePort] = (svc.spec?.ports ?? []).map { port in
+            Models.ServicePort(
                 name: port.name,
                 port: port.port,
-                targetPort: targetPortStr,
-                protocol_: port.protocol_ ?? "TCP"
+                targetPort: Self.extractTargetPort(port.targetPort, fallbackPort: port.port),
+                protocol_: port.`protocol` ?? "TCP"
             )
         }
 
@@ -458,8 +457,8 @@ extension NodeInfo {
             roles: roles.isEmpty ? ["worker"] : roles,
             kubeletVersion: node.status?.nodeInfo?.kubeletVersion ?? "unknown",
             osImage: node.status?.nodeInfo?.osImage ?? "unknown",
-            allocatableCPU: node.status?.allocatable?["cpu"]?.stringValue ?? "0",
-            allocatableMemory: node.status?.allocatable?["memory"]?.stringValue ?? "0",
+            allocatableCPU: node.status?.allocatable?["cpu"]?.description ?? "0",
+            allocatableMemory: node.status?.allocatable?["memory"]?.description ?? "0",
             conditions: conditions,
             health: ready ? .healthy : .error
         )
@@ -471,8 +470,8 @@ extension EventInfo {
         self.init(
             id: event.metadata?.uid ?? UUID().uuidString,
             namespace: event.metadata?.namespace ?? "default",
-            involvedObjectKind: event.involvedObject?.kind ?? "unknown",
-            involvedObjectName: event.involvedObject?.name ?? "unknown",
+            involvedObjectKind: event.involvedObject.kind ?? "unknown",
+            involvedObjectName: event.involvedObject.name ?? "unknown",
             reason: event.reason ?? "Unknown",
             message: event.message ?? "",
             type: event.type ?? "Normal",
@@ -510,7 +509,7 @@ extension SecretInfo {
             name: secret.name ?? "unknown",
             namespace: secret.metadata?.namespace ?? "default",
             type: secret.type ?? "Opaque",
-            dataKeys: Array(secret.data?.keys ?? [String: Data]().keys),
+            dataKeys: Array(secret.data?.keys ?? [String: String]().keys),
             creationTimestamp: secret.metadata?.creationTimestamp
         )
     }
@@ -523,7 +522,7 @@ extension PVCInfo {
             namespace: pvc.metadata?.namespace ?? "default",
             status: pvc.status?.phase ?? "Unknown",
             storageClass: pvc.spec?.storageClassName,
-            capacity: pvc.status?.capacity?["storage"]?.stringValue,
+            capacity: pvc.status?.capacity?["storage"]?.description,
             accessModes: pvc.spec?.accessModes ?? []
         )
     }

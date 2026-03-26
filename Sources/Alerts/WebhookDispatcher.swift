@@ -9,6 +9,9 @@
 
 import Database
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 import Hummingbird
 import Logging
 import Models
