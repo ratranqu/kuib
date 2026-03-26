@@ -7,8 +7,7 @@ import Models
 // MARK: - StatefulSet List
 
 /// Page listing all StatefulSets.
-public struct StatefulSetListPage: HTMLDocument {
-    public var title: String = "KUIB - StatefulSets"
+public struct StatefulSetListPage: HTML {
     let statefulSets: [StatefulSetInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -19,9 +18,7 @@ public struct StatefulSetListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "StatefulSets", currentPath: "/statefulsets") {
             PageHeader(title: "StatefulSets", subtitle: "\(statefulSets.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/statefulsets/list")
@@ -60,8 +57,7 @@ public struct StatefulSetListPage: HTMLDocument {
 // MARK: - DaemonSet List
 
 /// Page listing all DaemonSets.
-public struct DaemonSetListPage: HTMLDocument {
-    public var title: String = "KUIB - DaemonSets"
+public struct DaemonSetListPage: HTML {
     let daemonSets: [DaemonSetInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -72,9 +68,7 @@ public struct DaemonSetListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "DaemonSets", currentPath: "/daemonsets") {
             PageHeader(title: "DaemonSets", subtitle: "\(daemonSets.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/daemonsets/list")
@@ -113,17 +107,14 @@ public struct DaemonSetListPage: HTMLDocument {
 // MARK: - Namespace List
 
 /// Page listing all Namespaces.
-public struct NamespaceListPage: HTMLDocument {
-    public var title: String = "KUIB - Namespaces"
+public struct NamespaceListPage: HTML {
     let namespaces: [NamespaceInfo]
 
     public init(namespaces: [NamespaceInfo]) {
         self.namespaces = namespaces
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Namespaces", currentPath: "/namespaces") {
             PageHeader(title: "Namespaces", subtitle: "\(namespaces.count) total")
 

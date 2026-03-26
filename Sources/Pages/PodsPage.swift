@@ -13,9 +13,7 @@ import Models
 // MARK: - Pod List Page
 
 /// Page listing all pods with filtering and live updates.
-public struct PodListPage: HTMLDocument {
-    public var title: String = "KUIB - Pods"
-
+public struct PodListPage: HTML {
     let pods: [PodInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -26,9 +24,7 @@ public struct PodListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Pods", currentPath: "/pods") {
             PageHeader(title: "Pods", subtitle: "\(pods.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/pods/list")
@@ -96,21 +92,16 @@ public struct PodListPartial: HTML {
 // MARK: - Pod Detail Page
 
 /// Detailed view of a single pod with containers, events, and log streaming.
-public struct PodDetailPage: HTMLDocument {
-    public var title: String
-
+public struct PodDetailPage: HTML {
     let pod: PodInfo
     let events: [EventInfo]
 
     public init(pod: PodInfo, events: [EventInfo] = []) {
-        self.title = "KUIB - Pod: \(pod.name)"
         self.pod = pod
         self.events = events
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Pod: \(pod.name)", currentPath: "/pods") {
             // Breadcrumb
             nav(.class("flex items-center space-x-2 text-sm text-gray-500 mb-4")) {

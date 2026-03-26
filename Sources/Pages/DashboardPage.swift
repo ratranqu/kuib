@@ -9,9 +9,7 @@ import ElementaryHTMX
 import Models
 
 /// Main dashboard page with cluster health overview.
-public struct DashboardPage: HTMLDocument {
-    public var title: String = "KUIB - Dashboard"
-
+public struct DashboardPage: HTML {
     let summary: ClusterSummary
     let recentEvents: [EventInfo]
     let unhealthyPods: [PodInfo]
@@ -29,11 +27,7 @@ public struct DashboardPage: HTMLDocument {
         self.unhealthyDeployments = unhealthyDeployments
     }
 
-    public var head: some HTML {
-        EmptyHTML()
-    }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Dashboard", currentPath: "/") {
             // Page header
             PageHeader(title: "Cluster Dashboard", subtitle: "Real-time overview of your Kubernetes cluster")

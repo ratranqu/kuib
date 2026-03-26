@@ -126,13 +126,13 @@ public struct BaseLayout<Content: HTML>: HTMLDocument {
 // MARK: - Sidebar Components
 
 /// A titled section in the sidebar navigation.
-public struct SidebarSection<Content: HTML>: HTML {
+public struct SidebarSection<Inner: HTML>: HTML {
     let title: String
-    @HTMLBuilder let content: Content
+    @HTMLBuilder let inner: Inner
 
-    public init(title: String, @HTMLBuilder content: () -> Content) {
+    public init(title: String, @HTMLBuilder content: () -> Inner) {
         self.title = title
-        self.content = content()
+        self.inner = content()
     }
 
     public var content: some HTML {
@@ -140,7 +140,7 @@ public struct SidebarSection<Content: HTML>: HTML {
             h3(.class("px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1")) {
                 title
             }
-            self.content
+            inner
         }
     }
 }

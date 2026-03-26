@@ -5,9 +5,7 @@ import Elementary
 import Models
 
 /// Page listing all deployments.
-public struct DeploymentListPage: HTMLDocument {
-    public var title: String = "KUIB - Deployments"
-
+public struct DeploymentListPage: HTML {
     let deployments: [DeploymentInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -18,9 +16,7 @@ public struct DeploymentListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Deployments", currentPath: "/deployments") {
             PageHeader(title: "Deployments", subtitle: "\(deployments.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/deployments/list")
@@ -78,22 +74,18 @@ public struct DeploymentListPartial: HTML {
 }
 
 /// Detail page for a single deployment.
-public struct DeploymentDetailPage: HTMLDocument {
-    public var title: String
+public struct DeploymentDetailPage: HTML {
     let deployment: DeploymentInfo
     let pods: [PodInfo]
     let events: [EventInfo]
 
     public init(deployment: DeploymentInfo, pods: [PodInfo] = [], events: [EventInfo] = []) {
-        self.title = "KUIB - Deployment: \(deployment.name)"
         self.deployment = deployment
         self.pods = pods
         self.events = events
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Deployment: \(deployment.name)", currentPath: "/deployments") {
             nav(.class("flex items-center space-x-2 text-sm text-gray-500 mb-4")) {
                 a(.href("/deployments"), .class("hover:text-blue-600")) { "Deployments" }

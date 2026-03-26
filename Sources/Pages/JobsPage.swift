@@ -8,9 +8,7 @@ import Models
 // MARK: - Jobs List
 
 /// Page listing all Jobs.
-public struct JobListPage: HTMLDocument {
-    public var title: String = "KUIB - Jobs"
-
+public struct JobListPage: HTML {
     let jobs: [JobInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -21,9 +19,7 @@ public struct JobListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Jobs", currentPath: "/jobs") {
             PageHeader(title: "Jobs", subtitle: "\(jobs.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/jobs/list")
@@ -83,24 +79,20 @@ public struct JobListPartial: HTML {
 // MARK: - Job Detail
 
 /// Detail page for a single Job with log access.
-public struct JobDetailPage: HTMLDocument {
-    public var title: String
+public struct JobDetailPage: HTML {
     let job: JobInfo
     let pods: [PodInfo]
     let events: [EventInfo]
     let history: [JobRunRecord]
 
     public init(job: JobInfo, pods: [PodInfo] = [], events: [EventInfo] = [], history: [JobRunRecord] = []) {
-        self.title = "KUIB - Job: \(job.name)"
         self.job = job
         self.pods = pods
         self.events = events
         self.history = history
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "Job: \(job.name)", currentPath: "/jobs") {
             nav(.class("flex items-center space-x-2 text-sm text-gray-500 mb-4")) {
                 a(.href("/jobs"), .class("hover:text-blue-600")) { "Jobs" }
@@ -158,9 +150,7 @@ public struct JobDetailPage: HTMLDocument {
 // MARK: - CronJob List
 
 /// Page listing all CronJobs.
-public struct CronJobListPage: HTMLDocument {
-    public var title: String = "KUIB - CronJobs"
-
+public struct CronJobListPage: HTML {
     let cronJobs: [CronJobInfo]
     let namespaces: [NamespaceInfo]
     let selectedNamespace: String?
@@ -171,9 +161,7 @@ public struct CronJobListPage: HTMLDocument {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var head: some HTML { EmptyHTML() }
-
-    public var body: some HTML {
+    public var content: some HTML {
         BaseLayout(title: "CronJobs", currentPath: "/cronjobs") {
             PageHeader(title: "CronJobs", subtitle: "\(cronJobs.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/cronjobs/list")
