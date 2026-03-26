@@ -182,10 +182,10 @@ extension PodInfo {
         let containers = (pod.status?.containerStatuses ?? []).map { status in
             ContainerInfo(
                 name: status.name,
-                image: status.image ?? "unknown",
+                image: status.image,
                 state: ContainerState(from: status.state),
-                ready: status.ready ?? false,
-                restartCount: status.restartCount ?? 0
+                ready: status.ready,
+                restartCount: status.restartCount
             )
         }
 
@@ -243,7 +243,7 @@ extension ContainerState {
         } else if let terminated = state?.terminated {
             self = .terminated(
                 reason: terminated.reason,
-                exitCode: terminated.exitCode ?? -1,
+                exitCode: terminated.exitCode,
                 finishedAt: terminated.finishedAt
             )
         } else {
@@ -392,10 +392,19 @@ extension DaemonSetInfo {
 extension ServiceInfo {
     init(from svc: core.v1.Service) {
         let ports = (svc.spec?.ports ?? []).map { port in
-            Models.ServicePort(
+            let targetPortStr: String
+            if let tp = port.targetPort {
+                switch tp {
+                case .int(let value): targetPortStr = "\(value)"
+                case .string(let value): targetPortStr = value
+                }
+            } else {
+                targetPortStr = "\(port.port)"
+            }
+            return Models.ServicePort(
                 name: port.name,
-                port: port.port ?? 0,
-                targetPort: port.targetPort?.stringValue ?? "\(port.targetPort?.intValue ?? 0)",
+                port: port.port,
+                targetPort: targetPortStr,
                 protocol_: port.protocol_ ?? "TCP"
             )
         }
