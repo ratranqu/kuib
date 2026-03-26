@@ -1,0 +1,74 @@
+# ClusterRole granting read access to all monitored resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kuib-reader
+  labels:
+    app.kubernetes.io/name: kuib
+rules:
+  # Core resources
+  - apiGroups: [""]
+    resources:
+      - pods
+      - pods/log
+      - services
+      - events
+      - namespaces
+      - nodes
+      - configmaps
+      - secrets
+      - persistentvolumeclaims
+    verbs: ["get", "list", "watch"]
+
+  # Apps group
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - deployments/scale
+      - statefulsets
+      - daemonsets
+    verbs: ["get", "list", "watch"]
+
+  # Batch group
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["get", "list", "watch"]
+
+  # Networking
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+
+  # Write permissions for actions (pod delete, deployment scale, job delete)
+  - apiGroups: [""]
+    resources:
+      - pods
+    verbs: ["delete"]
+
+  - apiGroups: ["apps"]
+    resources:
+      - deployments/scale
+    verbs: ["update", "patch"]
+
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kuib-reader-binding
+  labels:
+    app.kubernetes.io/name: kuib
+subjects:
+  - kind: ServiceAccount
+    name: kuib
+    namespace: kuib
+roleRef:
+  kind: ClusterRole
+  name: kuib-reader
+  apiGroup: rbac.authorization.k8s.io

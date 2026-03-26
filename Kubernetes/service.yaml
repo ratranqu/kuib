@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kuib
+  namespace: kuib
+  labels:
+    app.kubernetes.io/name: kuib
+    app.kubernetes.io/component: server
+spec:
+  selector:
+    app.kubernetes.io/name: kuib
+    app.kubernetes.io/component: server
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+---
+# Optional: Ingress for external access
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kuib
+  namespace: kuib
+  labels:
+    app.kubernetes.io/name: kuib
+  annotations:
+    # Add oauth2-proxy annotations for authentication
+    nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: kuib.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kuib
+                port:
+                  number: 80
