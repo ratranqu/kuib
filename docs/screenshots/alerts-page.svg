@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 300" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="860" height="300" fill="#f3f4f6" rx="8"/>
+
+  <!-- Header -->
+  <text x="20" y="32" fill="#111827" font-size="20" font-weight="bold">Alerts</text>
+  <text x="20" y="50" fill="#6b7280" font-size="12">Alert history and active notifications</text>
+
+  <!-- Filter bar -->
+  <rect x="580" y="14" width="120" height="28" fill="#fff" rx="6" stroke="#d1d5db" stroke-width="1"/>
+  <text x="596" y="33" fill="#6b7280" font-size="11">All Severities</text>
+  <rect x="710" y="14" width="130" height="28" fill="#fff" rx="6" stroke="#d1d5db" stroke-width="1"/>
+  <text x="726" y="33" fill="#6b7280" font-size="11">All Namespaces</text>
+
+  <!-- Table -->
+  <rect x="20" y="60" width="820" height="228" fill="#fff" rx="8" filter="url(#shadow)"/>
+
+  <!-- Table header -->
+  <rect x="20" y="60" width="820" height="34" fill="#f9fafb" rx="8"/>
+  <rect x="20" y="82" width="820" height="12" fill="#f9fafb"/>
+  <text x="36" y="82" fill="#6b7280" font-size="11" font-weight="600">Severity</text>
+  <text x="120" y="82" fill="#6b7280" font-size="11" font-weight="600">Rule</text>
+  <text x="300" y="82" fill="#6b7280" font-size="11" font-weight="600">Resource</text>
+  <text x="460" y="82" fill="#6b7280" font-size="11" font-weight="600">Message</text>
+  <text x="700" y="82" fill="#6b7280" font-size="11" font-weight="600">Fired At</text>
+  <text x="790" y="82" fill="#6b7280" font-size="11" font-weight="600">Delivered</text>
+  <line x1="20" y1="94" x2="840" y2="94" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- Row 1 - Critical -->
+  <rect x="36" y="104" width="56" height="18" fill="#fecaca" rx="4"/>
+  <text x="44" y="117" fill="#dc2626" font-size="10" font-weight="600">Critical</text>
+  <text x="120" y="117" fill="#111827" font-size="12">CrashLoopBackOff</text>
+  <text x="300" y="117" fill="#374151" font-size="12">pod/api-server-7b8f9</text>
+  <text x="460" y="117" fill="#6b7280" font-size="11">Container restarting repeatedly</text>
+  <text x="700" y="117" fill="#6b7280" font-size="11">5m ago</text>
+  <rect x="796" y="106" width="16" height="16" fill="#dcfce7" rx="3"/>
+  <text x="800" y="118" fill="#16a34a" font-size="11">✓</text>
+  <line x1="36" y1="130" x2="824" y2="130" stroke="#f3f4f6" stroke-width="1"/>
+
+  <!-- Row 2 - Warning -->
+  <rect x="36" y="140" width="56" height="18" fill="#fef3c7" rx="4"/>
+  <text x="42" y="153" fill="#ca8a04" font-size="10" font-weight="600">Warning</text>
+  <text x="120" y="153" fill="#111827" font-size="12">ReplicaMismatch</text>
+  <text x="300" y="153" fill="#374151" font-size="12">deploy/nginx-deploy</text>
+  <text x="460" y="153" fill="#6b7280" font-size="11">Expected 3 replicas, only 2 ready</text>
+  <text x="700" y="153" fill="#6b7280" font-size="11">12m ago</text>
+  <rect x="796" y="142" width="16" height="16" fill="#dcfce7" rx="3"/>
+  <text x="800" y="154" fill="#16a34a" font-size="11">✓</text>
+  <line x1="36" y1="166" x2="824" y2="166" stroke="#f3f4f6" stroke-width="1"/>
+
+  <!-- Row 3 - Critical -->
+  <rect x="36" y="176" width="56" height="18" fill="#fecaca" rx="4"/>
+  <text x="44" y="189" fill="#dc2626" font-size="10" font-weight="600">Critical</text>
+  <text x="120" y="189" fill="#111827" font-size="12">OOMKilled</text>
+  <text x="300" y="189" fill="#374151" font-size="12">pod/data-processor-4k</text>
+  <text x="460" y="189" fill="#6b7280" font-size="11">Container exceeded memory limit</text>
+  <text x="700" y="189" fill="#6b7280" font-size="11">1h ago</text>
+  <rect x="796" y="178" width="16" height="16" fill="#dcfce7" rx="3"/>
+  <text x="800" y="190" fill="#16a34a" font-size="11">✓</text>
+  <line x1="36" y1="202" x2="824" y2="202" stroke="#f3f4f6" stroke-width="1"/>
+
+  <!-- Row 4 - Info -->
+  <rect x="36" y="212" width="56" height="18" fill="#dbeafe" rx="4"/>
+  <text x="52" y="225" fill="#2563eb" font-size="10" font-weight="600">Info</text>
+  <text x="120" y="225" fill="#111827" font-size="12">NodeNotReady</text>
+  <text x="300" y="225" fill="#374151" font-size="12">node/node-3</text>
+  <text x="460" y="225" fill="#6b7280" font-size="11">Node transitioned to NotReady</text>
+  <text x="700" y="225" fill="#6b7280" font-size="11">2h ago</text>
+  <rect x="796" y="214" width="16" height="16" fill="#fef3c7" rx="3"/>
+  <text x="800" y="226" fill="#ca8a04" font-size="11">!</text>
+  <line x1="36" y1="238" x2="824" y2="238" stroke="#f3f4f6" stroke-width="1"/>
+
+  <!-- Row 5 - Warning -->
+  <rect x="36" y="248" width="56" height="18" fill="#fef3c7" rx="4"/>
+  <text x="42" y="261" fill="#ca8a04" font-size="10" font-weight="600">Warning</text>
+  <text x="120" y="261" fill="#111827" font-size="12">ImagePullBackOff</text>
+  <text x="300" y="261" fill="#374151" font-size="12">pod/worker-node-2x9k</text>
+  <text x="460" y="261" fill="#6b7280" font-size="11">Failed to pull image "worker:latest"</text>
+  <text x="700" y="261" fill="#6b7280" font-size="11">3h ago</text>
+  <rect x="796" y="250" width="16" height="16" fill="#dcfce7" rx="3"/>
+  <text x="800" y="262" fill="#16a34a" font-size="11">✓</text>
+</svg>

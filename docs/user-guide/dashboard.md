@@ -2,6 +2,8 @@
 
 The dashboard is the landing page of KUIB, providing an at-a-glance overview of your cluster's health.
 
+![Dashboard Overview](../screenshots/dashboard-overview.svg)
+
 ## Stats Cards
 
 The top row shows four key metrics:
@@ -12,6 +14,10 @@ The top row shows four key metrics:
 - **Alerts** — Count of alerts fired in the last hour. Red when active, gray when clear.
 
 Stats auto-refresh every 5 seconds via HTMX.
+
+When all metrics are green, the dashboard shows a healthy cluster state:
+
+![Healthy Dashboard](../screenshots/dashboard-healthy.svg)
 
 ## Issues Panel
 

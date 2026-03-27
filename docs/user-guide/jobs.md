@@ -15,6 +15,9 @@ The jobs page shows all Kubernetes Jobs with:
 Four cards showing Active, Succeeded, Failed counts, and Duration.
 
 ### Run History Timeline
+
+![Job Timeline](../screenshots/job-timeline.svg)
+
 A Jenkins-style visual timeline showing recent job runs:
 - **Green bars** — Succeeded runs
 - **Red bars** — Failed runs
