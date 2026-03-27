@@ -18,7 +18,7 @@ public struct ConfigMapListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "ConfigMaps", currentPath: "/configmaps") {
             PageHeader(title: "ConfigMaps", subtitle: "\(configMaps.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/configmaps/list")
@@ -71,7 +71,7 @@ public struct SecretListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Secrets", currentPath: "/secrets") {
             PageHeader(title: "Secrets", subtitle: "\(secrets.count) total (metadata only)") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/secrets/list")
@@ -117,7 +117,7 @@ public struct PVCListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "PVCs", currentPath: "/pvcs") {
             PageHeader(title: "Persistent Volume Claims", subtitle: "\(pvcs.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/pvcs/list")

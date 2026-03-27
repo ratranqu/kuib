@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 200" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="740" height="200" fill="#f3f4f6" rx="8"/>
+
+  <!-- Stats Cards Row -->
+  <rect x="16" y="16" width="170" height="80" fill="#fff" rx="8" filter="url(#shadow)"/>
+  <text x="32" y="40" fill="#6b7280" font-size="11">Pods</text>
+  <text x="32" y="68" fill="#16a34a" font-size="28" font-weight="bold">24/24</text>
+  <text x="32" y="86" fill="#16a34a" font-size="11">All healthy</text>
+
+  <rect x="196" y="16" width="170" height="80" fill="#fff" rx="8" filter="url(#shadow)"/>
+  <text x="212" y="40" fill="#6b7280" font-size="11">Deployments</text>
+  <text x="212" y="68" fill="#16a34a" font-size="28" font-weight="bold">12/12</text>
+  <text x="212" y="86" fill="#16a34a" font-size="11">All healthy</text>
+
+  <rect x="376" y="16" width="170" height="80" fill="#fff" rx="8" filter="url(#shadow)"/>
+  <text x="392" y="40" fill="#6b7280" font-size="11">Nodes</text>
+  <text x="392" y="68" fill="#16a34a" font-size="28" font-weight="bold">3/3</text>
+  <text x="392" y="86" fill="#16a34a" font-size="11">All ready</text>
+
+  <rect x="556" y="16" width="170" height="80" fill="#fff" rx="8" filter="url(#shadow)"/>
+  <text x="572" y="40" fill="#6b7280" font-size="11">Alerts</text>
+  <text x="572" y="68" fill="#9ca3af" font-size="28" font-weight="bold">0</text>
+  <text x="572" y="86" fill="#9ca3af" font-size="11">No active alerts</text>
+
+  <!-- Healthy message -->
+  <rect x="16" y="112" width="710" height="72" fill="#fff" rx="8" filter="url(#shadow)"/>
+  <text x="370" y="148" fill="#16a34a" font-size="16" font-weight="600" text-anchor="middle">No issues detected</text>
+  <text x="370" y="168" fill="#6b7280" font-size="12" text-anchor="middle">All resources are healthy</text>
+</svg>

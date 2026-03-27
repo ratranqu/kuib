@@ -27,7 +27,7 @@ public struct DashboardPage: HTML {
         self.unhealthyDeployments = unhealthyDeployments
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Dashboard", currentPath: "/") {
             // Page header
             PageHeader(title: "Cluster Dashboard", subtitle: "Real-time overview of your Kubernetes cluster")
@@ -84,7 +84,7 @@ public struct DashboardPage: HTML {
 public struct DashboardStats: HTML {
     let summary: ClusterSummary
 
-    public var content: some HTML {
+    public var body: some HTML {
         StatCard(
             label: "Pods",
             value: "\(summary.runningPods)/\(summary.totalPods)",
@@ -117,7 +117,7 @@ public struct IssuesPanel: HTML {
     let pods: [PodInfo]
     let deployments: [DeploymentInfo]
 
-    public var content: some HTML {
+    public var body: some HTML {
         if pods.isEmpty && deployments.isEmpty {
             div(.class("text-center py-8")) {
                 p(.class("text-green-600 text-lg font-medium")) { "No issues detected" }
@@ -163,7 +163,7 @@ public struct IssuesPanel: HTML {
 public struct RecentEventsPanel: HTML {
     let events: [EventInfo]
 
-    public var content: some HTML {
+    public var body: some HTML {
         if events.isEmpty {
             EmptyState("No recent events")
         } else {

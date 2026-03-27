@@ -18,7 +18,7 @@ public struct AlertHistoryPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Alerts", currentPath: "/alerts") {
             PageHeader(title: "Alert History", subtitle: "\(alerts.count) alerts") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/alerts/list")
@@ -74,7 +74,7 @@ public struct AlertRulesPage: HTML {
         self.rules = rules
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Alert Rules", currentPath: "/alerts/rules") {
             PageHeader(title: "Alert Rules", subtitle: "\(rules.count) rules configured")
 
@@ -123,7 +123,7 @@ public struct WebhooksPage: HTML {
         self.endpoints = endpoints
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Webhooks", currentPath: "/alerts/webhooks") {
             PageHeader(title: "Webhook Endpoints", subtitle: "\(endpoints.count) configured")
 
@@ -170,7 +170,7 @@ public struct SeverityBadge: HTML {
         self.severity = severity
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         switch severity {
         case .info:
             span(.class("badge badge-info")) { "Info" }
@@ -190,7 +190,7 @@ public struct DeliveryStatusBadge: HTML {
         self.status = status
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         switch status {
         case .pending:
             span(.class("badge badge-warning")) { "Pending" }

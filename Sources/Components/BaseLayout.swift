@@ -28,8 +28,8 @@ public struct BaseLayout<Content: HTML>: HTMLDocument {
         meta(.charset(.utf8))
         meta(.name(.viewport), .content("width=device-width, initial-scale=1.0"))
         link(.rel(.stylesheet), .href("https://cdn.jsdelivr.net/npm/tailwindcss@3/dist/tailwind.min.css"))
-        script(.src("https://unpkg.com/htmx.org@2.0.0"))
-        script(.src("https://unpkg.com/htmx-ext-sse@2.0.0/sse.js"))
+        script(.src("https://unpkg.com/htmx.org@2.0.0")) { "" }
+        script(.src("https://unpkg.com/htmx-ext-sse@2.0.0/sse.js")) { "" }
         style {
             """
             .health-healthy { color: #10b981; }
@@ -135,7 +135,7 @@ public struct SidebarSection<Inner: HTML>: HTML {
         self.inner = content()
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         div(.class("mb-4")) {
             h3(.class("px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1")) {
                 title
@@ -152,9 +152,9 @@ public struct SidebarLink: HTML {
     let icon: String
     let currentPath: String
 
-    public var content: some HTML {
+    public var body: some HTML {
         let isActive = currentPath == path || (path != "/" && currentPath.hasPrefix(path))
-        a(
+        return a(
             .href(path),
             .class("sidebar-link\(isActive ? " active" : "")")
         ) {

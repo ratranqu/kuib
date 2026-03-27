@@ -2,6 +2,8 @@
 
 ## Pod List
 
+![Pod List](../screenshots/pod-list.svg)
+
 The pod list page shows all pods across the cluster with:
 - **Name** — Links to the pod detail page
 - **Namespace** — Which namespace the pod belongs to
@@ -20,6 +22,8 @@ The pod list auto-refreshes every 5 seconds to reflect the latest state.
 ## Pod Detail
 
 Click any pod name to see its detail page:
+
+![Pod Detail](../screenshots/pod-detail.svg)
 
 ### Metadata
 - Namespace, node, owner (ReplicaSet, Job, etc.), start time

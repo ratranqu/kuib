@@ -2,6 +2,8 @@
 
 ## Alert History
 
+![Alerts Page](../screenshots/alerts-page.svg)
+
 The alerts page shows all fired alerts with:
 - **Severity** — Info (blue), Warning (yellow), Critical (red)
 - **Rule** — Which alert rule was triggered

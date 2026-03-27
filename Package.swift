@@ -21,6 +21,7 @@ let package = Package(
 
         // Kubernetes client
         .package(url: "https://github.com/swiftkube/client.git", from: "0.25.0"),
+        .package(url: "https://github.com/swiftkube/model.git", from: "0.18.0"),
 
         // Database
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.21.0"),
@@ -96,7 +97,7 @@ let package = Package(
             dependencies: [
                 "Models",
                 .product(name: "SwiftkubeClient", package: "client"),
-                .product(name: "SwiftkubeModel", package: "client"),
+                .product(name: "SwiftkubeModel", package: "model"),
                 .product(name: "Logging", package: "swift-log"),
             ],
             path: "Sources/K8s"

@@ -18,7 +18,7 @@ public struct StatefulSetListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "StatefulSets", currentPath: "/statefulsets") {
             PageHeader(title: "StatefulSets", subtitle: "\(statefulSets.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/statefulsets/list")
@@ -68,7 +68,7 @@ public struct DaemonSetListPage: HTML {
         self.selectedNamespace = selectedNamespace
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "DaemonSets", currentPath: "/daemonsets") {
             PageHeader(title: "DaemonSets", subtitle: "\(daemonSets.count) total") {
                 NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/daemonsets/list")
@@ -114,7 +114,7 @@ public struct NamespaceListPage: HTML {
         self.namespaces = namespaces
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         BaseLayout(title: "Namespaces", currentPath: "/namespaces") {
             PageHeader(title: "Namespaces", subtitle: "\(namespaces.count) total")
 

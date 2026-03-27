@@ -4,7 +4,17 @@
 /// rendering of status badges, health indicators, resource cards, and tables.
 
 import Elementary
+import Foundation
 import Models
+
+// MARK: - Custom Attribute Helper
+
+extension HTMLAttribute where Tag: HTMLTrait.Attributes.Global {
+    /// Creates a custom HTML attribute with the given name and value.
+    public static func attribute(_ name: String, value: String) -> Self {
+        .init(name: name, value: value)
+    }
+}
 
 // MARK: - Health Badge
 
@@ -18,7 +28,7 @@ public struct HealthBadge: HTML {
         self.label = label
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         let badgeClass: String
         let text: String
 
@@ -37,7 +47,7 @@ public struct HealthBadge: HTML {
             text = label ?? "Unknown"
         }
 
-        span(.class("badge \(badgeClass)")) { text }
+        return span(.class("badge \(badgeClass)")) { text }
     }
 }
 
@@ -51,7 +61,7 @@ public struct PodPhaseBadge: HTML {
         self.phase = phase
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         let badgeClass: String
         switch phase {
         case .running: badgeClass = "badge-healthy"
@@ -60,7 +70,7 @@ public struct PodPhaseBadge: HTML {
         case .failed: badgeClass = "badge-error"
         case .unknown: badgeClass = "badge-unknown"
         }
-        span(.class("badge \(badgeClass)")) { phase.rawValue }
+        return span(.class("badge \(badgeClass)")) { phase.rawValue }
     }
 }
 
@@ -80,7 +90,7 @@ public struct StatCard: HTML {
         self.subtitle = subtitle
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         div(.class("bg-white rounded-lg shadow p-6")) {
             div(.class("flex items-center justify-between")) {
                 div {
@@ -103,16 +113,16 @@ public struct StatCard: HTML {
 // MARK: - Resource Table
 
 /// A styled table wrapper for resource listings.
-public struct ResourceTable<Header: HTML, Body: HTML>: HTML {
-    @HTMLBuilder let header: Header
-    @HTMLBuilder let body: Body
+public struct ResourceTable<Header: HTML, TableBody: HTML>: HTML {
+    @HTMLBuilder public let header: Header
+    @HTMLBuilder public let tableBody: TableBody
 
-    public init(@HTMLBuilder header: () -> Header, @HTMLBuilder body: () -> Body) {
+    public init(@HTMLBuilder header: () -> Header, @HTMLBuilder body: () -> TableBody) {
         self.header = header()
-        self.body = body()
+        self.tableBody = body()
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         div(.class("bg-white shadow rounded-lg overflow-hidden")) {
             div(.class("overflow-x-auto")) {
                 table(.class("min-w-full divide-y divide-gray-200")) {
@@ -120,7 +130,7 @@ public struct ResourceTable<Header: HTML, Body: HTML>: HTML {
                         tr { header }
                     }
                     tbody(.class("bg-white divide-y divide-gray-200")) {
-                        body
+                        tableBody
                     }
                 }
             }
@@ -136,7 +146,7 @@ public struct TableHeader: HTML {
         self.text = text
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         th(.class("px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider")) {
             text
         }
@@ -151,7 +161,7 @@ public struct TableCell<Content: HTML>: HTML {
         self.inner = inner()
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         td(.class("px-6 py-4 whitespace-nowrap text-sm")) {
             inner
         }
@@ -172,7 +182,7 @@ public struct PageHeader<Actions: HTML>: HTML {
         self.actions = actions()
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         div(.class("mb-6 flex items-center justify-between")) {
             div {
                 h1(.class("text-2xl font-bold text-gray-900")) { title }
@@ -201,7 +211,7 @@ public struct NamespaceFilter: HTML {
         self.targetUrl = targetUrl
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         select(
             .class("block w-48 rounded-md border-gray-300 shadow-sm text-sm"),
             .name("namespace"),
@@ -232,7 +242,7 @@ public struct EmptyState: HTML {
         self.message = message
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         div(.class("text-center py-12")) {
             p(.class("text-gray-500 text-lg")) { message }
         }
@@ -249,10 +259,13 @@ public struct Timestamp: HTML {
         self.date = date
     }
 
-    public var content: some HTML {
-        if let date = date {
-            let formatter = ISO8601DateFormatter()
-            span(.class("text-gray-500")) { formatter.string(from: date) }
+    private var formattedDate: String? {
+        date.map { ISO8601DateFormatter().string(from: $0) }
+    }
+
+    public var body: some HTML {
+        if let formatted = formattedDate {
+            span(.class("text-gray-500")) { formatted }
         } else {
             span(.class("text-gray-400")) { "-" }
         }
@@ -271,7 +284,7 @@ public struct LabelsDisplay: HTML {
         self.maxDisplay = maxDisplay
     }
 
-    public var content: some HTML {
+    public var body: some HTML {
         div(.class("flex flex-wrap gap-1")) {
             let sortedLabels = labels.sorted { $0.key < $1.key }
             for (index, label) in sortedLabels.enumerated() {

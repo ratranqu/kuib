@@ -2,10 +2,18 @@
 
 import Alerts
 import Database
+import Foundation
 import HTTPTypes
 import Hummingbird
 import K8s
 import Models
+
+/// A log entry for the historical logs API response.
+private struct LogEntry: Codable {
+    let container: String
+    let capturedAt: Date
+    let preview: String
+}
 
 /// Register JSON API routes.
 public func registerAPIRoutes(
@@ -166,12 +174,6 @@ public func registerAPIRoutes(
         let logs = (try? await db.getPodLogs(namespace: ns, podName: name)) ?? []
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-
-        struct LogEntry: Codable {
-            let container: String
-            let capturedAt: Date
-            let preview: String
-        }
 
         let entries = logs.map { log in
             LogEntry(
