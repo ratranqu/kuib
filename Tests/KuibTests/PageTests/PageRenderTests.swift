@@ -140,6 +140,30 @@ struct PageRenderTests {
         #expect(html.contains("selected"))
     }
 
+    @Test("Resource filter bar renders all filter inputs")
+    func resourceFilterBarRenders() {
+        let namespaces = TestFixtures.sampleNamespaces()
+        let filter = ResourceFilter(namespace: "production", labelSelectors: ["app": "web"], health: .healthy, nameContains: "api")
+        let html = render(ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/pods/list"))
+
+        #expect(html.contains("All Namespaces"))
+        #expect(html.contains("production"))
+        #expect(html.contains("app=web"))
+        #expect(html.contains("api"))
+        #expect(html.contains("All Status"))
+        #expect(html.contains("active filter"))
+    }
+
+    @Test("Resource filter bar hides health filter when disabled")
+    func resourceFilterBarNoHealth() {
+        let namespaces = TestFixtures.sampleNamespaces()
+        let filter = ResourceFilter()
+        let html = render(ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/test", showHealthFilter: false))
+
+        #expect(!html.contains("All Status"))
+        #expect(!html.contains("name=\"health\""))
+    }
+
     @Test("Severity badge renders all levels")
     func severityBadge() {
         let info = render(SeverityBadge(.info))

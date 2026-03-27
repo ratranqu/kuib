@@ -8,22 +8,22 @@ import Models
 public struct DeploymentListPage: HTML {
     let deployments: [DeploymentInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(deployments: [DeploymentInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(deployments: [DeploymentInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.deployments = deployments
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "Deployments", currentPath: "/deployments") {
-            PageHeader(title: "Deployments", subtitle: "\(deployments.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/deployments/list")
-            }
+            PageHeader(title: "Deployments", subtitle: "\(deployments.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/deployments/list")
 
             div(.id("resource-list"),
-                .attribute("hx-get", value: "/partials/deployments/list\(selectedNamespace.map { "?namespace=\($0)" } ?? "")"),
+                .attribute("hx-get", value: "/partials/deployments/list\(filter.queryString)"),
                 .attribute("hx-trigger", value: "every 10s"),
                 .attribute("hx-swap", value: "innerHTML")
             ) {

@@ -10,19 +10,19 @@ import Models
 public struct StatefulSetListPage: HTML {
     let statefulSets: [StatefulSetInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(statefulSets: [StatefulSetInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(statefulSets: [StatefulSetInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.statefulSets = statefulSets
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "StatefulSets", currentPath: "/statefulsets") {
-            PageHeader(title: "StatefulSets", subtitle: "\(statefulSets.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/statefulsets/list")
-            }
+            PageHeader(title: "StatefulSets", subtitle: "\(statefulSets.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/statefulsets/list")
             div(.id("resource-list")) {
                 if statefulSets.isEmpty {
                     EmptyState("No StatefulSets found")
@@ -60,19 +60,19 @@ public struct StatefulSetListPage: HTML {
 public struct DaemonSetListPage: HTML {
     let daemonSets: [DaemonSetInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(daemonSets: [DaemonSetInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(daemonSets: [DaemonSetInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.daemonSets = daemonSets
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "DaemonSets", currentPath: "/daemonsets") {
-            PageHeader(title: "DaemonSets", subtitle: "\(daemonSets.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/daemonsets/list")
-            }
+            PageHeader(title: "DaemonSets", subtitle: "\(daemonSets.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/daemonsets/list")
             div(.id("resource-list")) {
                 if daemonSets.isEmpty {
                     EmptyState("No DaemonSets found")

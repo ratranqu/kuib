@@ -11,6 +11,21 @@ import K8s
 import Models
 import Pages
 
+/// Extract a ``ResourceFilter`` from HTTP query parameters.
+private func extractFilter(from request: Request) -> ResourceFilter {
+    let namespace = request.uri.queryParameters.get("namespace")
+    let labelsRaw = request.uri.queryParameters.get("labels")
+    let healthRaw = request.uri.queryParameters.get("health")
+    let search = request.uri.queryParameters.get("search")
+
+    return ResourceFilter(
+        namespace: namespace?.isEmpty == true ? nil : namespace,
+        labelSelectors: ResourceFilter.parseLabels(labelsRaw),
+        health: healthRaw.flatMap { ResourceHealth(rawValue: $0) },
+        nameContains: search?.isEmpty == true ? nil : search
+    )
+}
+
 /// Register all page routes on the router.
 public func registerPageRoutes(
     router: Router<some RequestContext>,
@@ -39,12 +54,12 @@ public func registerPageRoutes(
     // MARK: - Pods
 
     router.get("/pods") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let pods = await cache.pods(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let pods = await cache.pods(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            PodListPage(pods: pods, namespaces: namespaces, selectedNamespace: namespace)
+            PodListPage(pods: pods, namespaces: namespaces, filter: filter)
         }
     }
 
@@ -68,12 +83,12 @@ public func registerPageRoutes(
     // MARK: - Deployments
 
     router.get("/deployments") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let deployments = await cache.deployments(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let deployments = await cache.deployments(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            DeploymentListPage(deployments: deployments, namespaces: namespaces, selectedNamespace: namespace)
+            DeploymentListPage(deployments: deployments, namespaces: namespaces, filter: filter)
         }
     }
 
@@ -101,12 +116,12 @@ public func registerPageRoutes(
     // MARK: - Jobs
 
     router.get("/jobs") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let jobs = await cache.jobs(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let jobs = await cache.jobs(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            JobListPage(jobs: jobs, namespaces: namespaces, selectedNamespace: namespace)
+            JobListPage(jobs: jobs, namespaces: namespaces, filter: filter)
         }
     }
 
@@ -133,60 +148,60 @@ public func registerPageRoutes(
     // MARK: - CronJobs
 
     router.get("/cronjobs") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let cronJobs = await cache.cronJobs(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let cronJobs = await cache.cronJobs(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            CronJobListPage(cronJobs: cronJobs, namespaces: namespaces, selectedNamespace: namespace)
+            CronJobListPage(cronJobs: cronJobs, namespaces: namespaces, filter: filter)
         }
     }
 
     // MARK: - StatefulSets
 
     router.get("/statefulsets") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let sets = await cache.statefulSets(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let sets = await cache.statefulSets(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            StatefulSetListPage(statefulSets: sets, namespaces: namespaces, selectedNamespace: namespace)
+            StatefulSetListPage(statefulSets: sets, namespaces: namespaces, filter: filter)
         }
     }
 
     // MARK: - DaemonSets
 
     router.get("/daemonsets") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let sets = await cache.daemonSets(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let sets = await cache.daemonSets(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            DaemonSetListPage(daemonSets: sets, namespaces: namespaces, selectedNamespace: namespace)
+            DaemonSetListPage(daemonSets: sets, namespaces: namespaces, filter: filter)
         }
     }
 
     // MARK: - Services
 
     router.get("/services") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let services = await cache.services(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let services = await cache.services(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            ServiceListPage(services: services, namespaces: namespaces, selectedNamespace: namespace)
+            ServiceListPage(services: services, namespaces: namespaces, filter: filter)
         }
     }
 
     // MARK: - Ingresses
 
     router.get("/ingresses") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let ingresses = await cache.ingresses(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let ingresses = await cache.ingresses(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            IngressListPage(ingresses: ingresses, namespaces: namespaces, selectedNamespace: namespace)
+            IngressListPage(ingresses: ingresses, namespaces: namespaces, filter: filter)
         }
     }
 
@@ -238,36 +253,36 @@ public func registerPageRoutes(
     // MARK: - ConfigMaps
 
     router.get("/configmaps") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let cms = await cache.configMaps(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let cms = await cache.configMaps(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            ConfigMapListPage(configMaps: cms, namespaces: namespaces, selectedNamespace: namespace)
+            ConfigMapListPage(configMaps: cms, namespaces: namespaces, filter: filter)
         }
     }
 
     // MARK: - Secrets
 
     router.get("/secrets") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let secrets = await cache.secrets(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let secrets = await cache.secrets(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            SecretListPage(secrets: secrets, namespaces: namespaces, selectedNamespace: namespace)
+            SecretListPage(secrets: secrets, namespaces: namespaces, filter: filter)
         }
     }
 
     // MARK: - PVCs
 
     router.get("/pvcs") { request, _ -> HTMLResponse in
-        let namespace = request.uri.queryParameters.get("namespace")
-        let pvcs = await cache.pvcs(namespace: namespace)
+        let filter = extractFilter(from: request)
+        let pvcs = await cache.pvcs(filter: filter)
         let namespaces = await cache.namespaces()
 
         return HTMLResponse {
-            PVCListPage(pvcs: pvcs, namespaces: namespaces, selectedNamespace: namespace)
+            PVCListPage(pvcs: pvcs, namespaces: namespaces, filter: filter)
         }
     }
 }

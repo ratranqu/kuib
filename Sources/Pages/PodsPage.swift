@@ -17,22 +17,22 @@ import Models
 public struct PodListPage: HTML {
     let pods: [PodInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(pods: [PodInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(pods: [PodInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.pods = pods
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "Pods", currentPath: "/pods") {
-            PageHeader(title: "Pods", subtitle: "\(pods.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/pods/list")
-            }
+            PageHeader(title: "Pods", subtitle: "\(pods.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/pods/list")
 
             div(.id("resource-list"),
-                .attribute("hx-get", value: "/partials/pods/list\(selectedNamespace.map { "?namespace=\($0)" } ?? "")"),
+                .attribute("hx-get", value: "/partials/pods/list\(filter.queryString)"),
                 .attribute("hx-trigger", value: "every 5s"),
                 .attribute("hx-swap", value: "innerHTML")
             ) {

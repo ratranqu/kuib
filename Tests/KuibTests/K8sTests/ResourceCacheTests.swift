@@ -144,4 +144,121 @@ struct ResourceCacheTests {
         let ns2Jobs = await cache.jobs(namespace: "ns2")
         #expect(ns2Jobs.isEmpty)
     }
+
+    @Test("ResourceFilter filters by namespace")
+    func filterByNamespace() async {
+        let cache = ResourceCache()
+        await cache.updatePods(TestFixtures.samplePods())
+
+        let filter = ResourceFilter(namespace: "production")
+        let pods = await cache.pods(filter: filter)
+        #expect(pods.count == 1)
+        #expect(pods[0].name == "api-ghi789")
+    }
+
+    @Test("ResourceFilter filters by label selectors")
+    func filterByLabels() async {
+        let cache = ResourceCache()
+        await cache.updatePods(TestFixtures.samplePods())
+
+        let filter = ResourceFilter(labelSelectors: ["app": "web"])
+        let pods = await cache.pods(filter: filter)
+        #expect(pods.count == 1)
+        #expect(pods[0].name == "web-abc123")
+    }
+
+    @Test("ResourceFilter filters by health status")
+    func filterByHealth() async {
+        let cache = ResourceCache()
+        await cache.updatePods(TestFixtures.samplePods())
+
+        let filter = ResourceFilter(health: .error)
+        let pods = await cache.pods(filter: filter)
+        #expect(pods.count == 1)
+        #expect(pods[0].name == "worker-def456")
+    }
+
+    @Test("ResourceFilter filters by name search")
+    func filterByNameSearch() async {
+        let cache = ResourceCache()
+        await cache.updatePods(TestFixtures.samplePods())
+
+        let filter = ResourceFilter(nameContains: "api")
+        let pods = await cache.pods(filter: filter)
+        #expect(pods.count == 1)
+        #expect(pods[0].name == "api-ghi789")
+    }
+
+    @Test("ResourceFilter combines multiple selectors with AND logic")
+    func filterCombined() async {
+        let cache = ResourceCache()
+        await cache.updatePods(TestFixtures.samplePods())
+
+        // namespace=default AND health=healthy -> only web-abc123
+        let filter = ResourceFilter(namespace: "default", health: .healthy)
+        let pods = await cache.pods(filter: filter)
+        #expect(pods.count == 1)
+        #expect(pods[0].name == "web-abc123")
+    }
+
+    @Test("ResourceFilter empty filter returns all")
+    func filterEmpty() async {
+        let cache = ResourceCache()
+        await cache.updatePods(TestFixtures.samplePods())
+
+        let filter = ResourceFilter()
+        let pods = await cache.pods(filter: filter)
+        #expect(pods.count == 3)
+    }
+
+    @Test("ResourceFilter.parseLabels parses correctly")
+    func parseLabels() {
+        let labels = ResourceFilter.parseLabels("app=nginx,env=prod")
+        #expect(labels == ["app": "nginx", "env": "prod"])
+
+        let empty = ResourceFilter.parseLabels(nil)
+        #expect(empty.isEmpty)
+
+        let emptyStr = ResourceFilter.parseLabels("")
+        #expect(emptyStr.isEmpty)
+
+        let single = ResourceFilter.parseLabels("app=web")
+        #expect(single == ["app": "web"])
+    }
+
+    @Test("ResourceFilter.queryString builds correct URL params")
+    func queryString() {
+        let empty = ResourceFilter()
+        #expect(empty.queryString == "")
+
+        let nsOnly = ResourceFilter(namespace: "default")
+        #expect(nsOnly.queryString == "?namespace=default")
+
+        let full = ResourceFilter(namespace: "prod", health: .error, nameContains: "api")
+        #expect(full.queryString.contains("namespace=prod"))
+        #expect(full.queryString.contains("health=error"))
+        #expect(full.queryString.contains("search=api"))
+    }
+
+    @Test("ResourceFilter works with deployments")
+    func filterDeployments() async {
+        let cache = ResourceCache()
+        await cache.updateDeployments(TestFixtures.sampleDeployments())
+
+        let filter = ResourceFilter(health: .warning)
+        let deployments = await cache.deployments(filter: filter)
+        #expect(deployments.count == 1)
+        #expect(deployments[0].name == "api")
+    }
+
+    @Test("ResourceFilter works with jobs")
+    func filterJobs() async {
+        let cache = ResourceCache()
+        await cache.updateJobs(TestFixtures.sampleJobs())
+
+        let filter = ResourceFilter(namespace: "production", labelSelectors: ["job": "report"])
+        let jobs = await cache.jobs(filter: filter)
+        #expect(jobs.count == 1)
+        #expect(jobs[0].name == "report-gen-11111")
+    }
 }

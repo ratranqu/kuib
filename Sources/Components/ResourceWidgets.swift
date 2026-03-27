@@ -232,6 +232,140 @@ public struct NamespaceFilter: HTML {
     }
 }
 
+// MARK: - Resource Filter Bar
+
+/// A comprehensive filter bar combining namespace, label selectors, health, and name search.
+///
+/// All filter inputs use HTMX to dynamically update the resource list without full page reloads.
+/// Filters are combined with AND logic — a resource must match all active criteria.
+public struct ResourceFilterBar: HTML {
+    let namespaces: [NamespaceInfo]
+    let filter: ResourceFilter
+    let targetUrl: String
+    let showHealthFilter: Bool
+
+    public init(
+        namespaces: [NamespaceInfo],
+        filter: ResourceFilter,
+        targetUrl: String,
+        showHealthFilter: Bool = true
+    ) {
+        self.namespaces = namespaces
+        self.filter = filter
+        self.targetUrl = targetUrl
+        self.showHealthFilter = showHealthFilter
+    }
+
+    /// Names of all filter inputs for hx-include.
+    private var includeSelector: String {
+        "[name='namespace'],[name='labels'],[name='search']\(showHealthFilter ? ",[name='health']" : "")"
+    }
+
+    public var body: some HTML {
+        div(.class("flex flex-wrap items-center gap-3 mb-6 p-4 bg-white rounded-lg shadow")) {
+            // Namespace dropdown
+            select(
+                .class("block w-48 rounded-md border-gray-300 shadow-sm text-sm"),
+                .name("namespace"),
+                .attribute("hx-get", value: targetUrl),
+                .attribute("hx-target", value: "#resource-list"),
+                .attribute("hx-trigger", value: "change"),
+                .attribute("hx-include", value: includeSelector)
+            ) {
+                option(.value("")) { "All Namespaces" }
+                for ns in namespaces {
+                    if ns.name == filter.namespace {
+                        option(.value(ns.name), .selected) { ns.name }
+                    } else {
+                        option(.value(ns.name)) { ns.name }
+                    }
+                }
+            }
+
+            // Label selector input
+            div(.class("relative")) {
+                input(
+                    .class("block w-56 rounded-md border-gray-300 shadow-sm text-sm pl-8"),
+                    .type(.text),
+                    .name("labels"),
+                    .value(filter.labelSelectors.map { "\($0.key)=\($0.value)" }.joined(separator: ",")),
+                    .attribute("placeholder", value: "Labels: app=nginx,env=prod"),
+                    .attribute("hx-get", value: targetUrl),
+                    .attribute("hx-target", value: "#resource-list"),
+                    .attribute("hx-trigger", value: "keyup changed delay:400ms"),
+                    .attribute("hx-include", value: includeSelector)
+                )
+                div(.class("absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none")) {
+                    span(.class("text-gray-400 text-xs")) { "L" }
+                }
+            }
+
+            // Name search input
+            div(.class("relative")) {
+                input(
+                    .class("block w-48 rounded-md border-gray-300 shadow-sm text-sm pl-8"),
+                    .type(.text),
+                    .name("search"),
+                    .value(filter.nameContains ?? ""),
+                    .attribute("placeholder", value: "Search by name..."),
+                    .attribute("hx-get", value: targetUrl),
+                    .attribute("hx-target", value: "#resource-list"),
+                    .attribute("hx-trigger", value: "keyup changed delay:300ms"),
+                    .attribute("hx-include", value: includeSelector)
+                )
+                div(.class("absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none")) {
+                    span(.class("text-gray-400 text-xs")) { "S" }
+                }
+            }
+
+            // Health filter dropdown (only for resources that have health)
+            if showHealthFilter {
+                select(
+                    .class("block w-36 rounded-md border-gray-300 shadow-sm text-sm"),
+                    .name("health"),
+                    .attribute("hx-get", value: targetUrl),
+                    .attribute("hx-target", value: "#resource-list"),
+                    .attribute("hx-trigger", value: "change"),
+                    .attribute("hx-include", value: includeSelector)
+                ) {
+                    option(.value("")) { "All Status" }
+                    if filter.health == .healthy {
+                        option(.value("healthy"), .selected) { "Healthy" }
+                    } else {
+                        option(.value("healthy")) { "Healthy" }
+                    }
+                    if filter.health == .warning {
+                        option(.value("warning"), .selected) { "Warning" }
+                    } else {
+                        option(.value("warning")) { "Warning" }
+                    }
+                    if filter.health == .error {
+                        option(.value("error"), .selected) { "Error" }
+                    } else {
+                        option(.value("error")) { "Error" }
+                    }
+                    if filter.health == .unknown {
+                        option(.value("unknown"), .selected) { "Unknown" }
+                    } else {
+                        option(.value("unknown")) { "Unknown" }
+                    }
+                }
+            }
+
+            // Active filter count badge
+            if !filter.isEmpty {
+                let activeCount = (filter.namespace != nil ? 1 : 0)
+                    + (filter.labelSelectors.isEmpty ? 0 : 1)
+                    + (filter.health != nil ? 1 : 0)
+                    + (filter.nameContains != nil && !filter.nameContains!.isEmpty ? 1 : 0)
+                span(.class("inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700")) {
+                    "\(activeCount) active filter\(activeCount == 1 ? "" : "s")"
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Empty State
 
 /// Shown when a resource list is empty.

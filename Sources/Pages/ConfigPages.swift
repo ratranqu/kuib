@@ -10,19 +10,19 @@ import Models
 public struct ConfigMapListPage: HTML {
     let configMaps: [ConfigMapInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(configMaps: [ConfigMapInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(configMaps: [ConfigMapInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.configMaps = configMaps
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "ConfigMaps", currentPath: "/configmaps") {
-            PageHeader(title: "ConfigMaps", subtitle: "\(configMaps.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/configmaps/list")
-            }
+            PageHeader(title: "ConfigMaps", subtitle: "\(configMaps.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/configmaps/list", showHealthFilter: false)
             div(.id("resource-list")) {
                 if configMaps.isEmpty {
                     EmptyState("No ConfigMaps found")
@@ -63,19 +63,19 @@ public struct ConfigMapListPage: HTML {
 public struct SecretListPage: HTML {
     let secrets: [SecretInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(secrets: [SecretInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(secrets: [SecretInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.secrets = secrets
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "Secrets", currentPath: "/secrets") {
-            PageHeader(title: "Secrets", subtitle: "\(secrets.count) total (metadata only)") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/secrets/list")
-            }
+            PageHeader(title: "Secrets", subtitle: "\(secrets.count) total (metadata only)")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/secrets/list", showHealthFilter: false)
             div(.id("resource-list")) {
                 if secrets.isEmpty {
                     EmptyState("No secrets found")
@@ -109,19 +109,19 @@ public struct SecretListPage: HTML {
 public struct PVCListPage: HTML {
     let pvcs: [PVCInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(pvcs: [PVCInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(pvcs: [PVCInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.pvcs = pvcs
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "PVCs", currentPath: "/pvcs") {
-            PageHeader(title: "Persistent Volume Claims", subtitle: "\(pvcs.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/pvcs/list")
-            }
+            PageHeader(title: "Persistent Volume Claims", subtitle: "\(pvcs.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/pvcs/list", showHealthFilter: false)
             div(.id("resource-list")) {
                 if pvcs.isEmpty {
                     EmptyState("No PVCs found")

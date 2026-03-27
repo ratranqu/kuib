@@ -66,10 +66,23 @@ public actor ResourceCache {
 
     // MARK: - Read
 
+    // MARK: - Generic Filter
+
+    /// Applies a ``ResourceFilter`` to any array of ``Filterable`` resources.
+    private func applyFilter<T: Filterable>(_ items: [T], filter: ResourceFilter) -> [T] {
+        if filter.isEmpty { return items }
+        return items.filter { $0.matches(filter) }
+    }
+
     /// Returns pods, optionally filtered by namespace.
     public func pods(namespace: String? = nil) -> [PodInfo] {
         guard let ns = namespace else { return allPods }
         return allPods.filter { $0.namespace == ns }
+    }
+
+    /// Returns pods matching a ``ResourceFilter``.
+    public func pods(filter: ResourceFilter) -> [PodInfo] {
+        applyFilter(allPods, filter: filter)
     }
 
     /// Returns a single pod by namespace and name.
@@ -83,6 +96,11 @@ public actor ResourceCache {
         return allDeployments.filter { $0.namespace == ns }
     }
 
+    /// Returns deployments matching a ``ResourceFilter``.
+    public func deployments(filter: ResourceFilter) -> [DeploymentInfo] {
+        applyFilter(allDeployments, filter: filter)
+    }
+
     /// Returns a single deployment by namespace and name.
     public func deployment(namespace: String, name: String) -> DeploymentInfo? {
         allDeployments.first { $0.namespace == namespace && $0.name == name }
@@ -91,6 +109,10 @@ public actor ResourceCache {
     public func jobs(namespace: String? = nil) -> [JobInfo] {
         guard let ns = namespace else { return allJobs }
         return allJobs.filter { $0.namespace == ns }
+    }
+
+    public func jobs(filter: ResourceFilter) -> [JobInfo] {
+        applyFilter(allJobs, filter: filter)
     }
 
     public func job(namespace: String, name: String) -> JobInfo? {
@@ -102,9 +124,17 @@ public actor ResourceCache {
         return allCronJobs.filter { $0.namespace == ns }
     }
 
+    public func cronJobs(filter: ResourceFilter) -> [CronJobInfo] {
+        applyFilter(allCronJobs, filter: filter)
+    }
+
     public func statefulSets(namespace: String? = nil) -> [StatefulSetInfo] {
         guard let ns = namespace else { return allStatefulSets }
         return allStatefulSets.filter { $0.namespace == ns }
+    }
+
+    public func statefulSets(filter: ResourceFilter) -> [StatefulSetInfo] {
+        applyFilter(allStatefulSets, filter: filter)
     }
 
     public func daemonSets(namespace: String? = nil) -> [DaemonSetInfo] {
@@ -112,14 +142,26 @@ public actor ResourceCache {
         return allDaemonSets.filter { $0.namespace == ns }
     }
 
+    public func daemonSets(filter: ResourceFilter) -> [DaemonSetInfo] {
+        applyFilter(allDaemonSets, filter: filter)
+    }
+
     public func services(namespace: String? = nil) -> [ServiceInfo] {
         guard let ns = namespace else { return allServices }
         return allServices.filter { $0.namespace == ns }
     }
 
+    public func services(filter: ResourceFilter) -> [ServiceInfo] {
+        applyFilter(allServices, filter: filter)
+    }
+
     public func ingresses(namespace: String? = nil) -> [IngressInfo] {
         guard let ns = namespace else { return allIngresses }
         return allIngresses.filter { $0.namespace == ns }
+    }
+
+    public func ingresses(filter: ResourceFilter) -> [IngressInfo] {
+        applyFilter(allIngresses, filter: filter)
     }
 
     public func nodes() -> [NodeInfo] { allNodes }
@@ -136,14 +178,26 @@ public actor ResourceCache {
         return allConfigMaps.filter { $0.namespace == ns }
     }
 
+    public func configMaps(filter: ResourceFilter) -> [ConfigMapInfo] {
+        applyFilter(allConfigMaps, filter: filter)
+    }
+
     public func secrets(namespace: String? = nil) -> [SecretInfo] {
         guard let ns = namespace else { return allSecrets }
         return allSecrets.filter { $0.namespace == ns }
     }
 
+    public func secrets(filter: ResourceFilter) -> [SecretInfo] {
+        applyFilter(allSecrets, filter: filter)
+    }
+
     public func pvcs(namespace: String? = nil) -> [PVCInfo] {
         guard let ns = namespace else { return allPVCs }
         return allPVCs.filter { $0.namespace == ns }
+    }
+
+    public func pvcs(filter: ResourceFilter) -> [PVCInfo] {
+        applyFilter(allPVCs, filter: filter)
     }
 
     /// Computes a cluster summary from the cached state.

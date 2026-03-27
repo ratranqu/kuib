@@ -12,19 +12,19 @@ import Models
 public struct JobListPage: HTML {
     let jobs: [JobInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(jobs: [JobInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(jobs: [JobInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.jobs = jobs
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "Jobs", currentPath: "/jobs") {
-            PageHeader(title: "Jobs", subtitle: "\(jobs.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/jobs/list")
-            }
+            PageHeader(title: "Jobs", subtitle: "\(jobs.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/jobs/list")
 
             div(.id("resource-list")) {
                 JobListPartial(jobs: jobs)
@@ -154,19 +154,19 @@ public struct JobDetailPage: HTML {
 public struct CronJobListPage: HTML {
     let cronJobs: [CronJobInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(cronJobs: [CronJobInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(cronJobs: [CronJobInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.cronJobs = cronJobs
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "CronJobs", currentPath: "/cronjobs") {
-            PageHeader(title: "CronJobs", subtitle: "\(cronJobs.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/cronjobs/list")
-            }
+            PageHeader(title: "CronJobs", subtitle: "\(cronJobs.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/cronjobs/list")
 
             div(.id("resource-list")) {
                 if cronJobs.isEmpty {

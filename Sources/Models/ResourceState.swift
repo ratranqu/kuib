@@ -535,3 +535,140 @@ public struct ClusterSummary: Sendable, Codable {
         self.namespaces = namespaces
     }
 }
+
+// MARK: - Resource Filter
+
+/// A collection of selectors for filtering Kubernetes resources.
+///
+/// Combines namespace, label selectors, health status, and name search
+/// into a single filter that can be applied to any resource list.
+public struct ResourceFilter: Sendable, Codable {
+    /// Filter by namespace. Nil means all namespaces.
+    public let namespace: String?
+
+    /// Label selectors as key=value pairs. All must match (AND logic).
+    public let labelSelectors: [String: String]
+
+    /// Filter by health status. Nil means all statuses.
+    public let health: ResourceHealth?
+
+    /// Substring search on resource name (case-insensitive). Nil means no name filter.
+    public let nameContains: String?
+
+    public init(
+        namespace: String? = nil,
+        labelSelectors: [String: String] = [:],
+        health: ResourceHealth? = nil,
+        nameContains: String? = nil
+    ) {
+        self.namespace = namespace
+        self.labelSelectors = labelSelectors
+        self.health = health
+        self.nameContains = nameContains
+    }
+
+    /// True when no filter criteria are set.
+    public var isEmpty: Bool {
+        namespace == nil && labelSelectors.isEmpty && health == nil && nameContains == nil
+    }
+
+    /// Parse label selectors from a comma-separated string of key=value pairs.
+    /// Example: "app=nginx,env=prod"
+    public static func parseLabels(_ raw: String?) -> [String: String] {
+        guard let raw, !raw.isEmpty else { return [:] }
+        var result: [String: String] = [:]
+        for pair in raw.split(separator: ",") {
+            let parts = pair.split(separator: "=", maxSplits: 1)
+            if parts.count == 2 {
+                result[String(parts[0]).trimmingCharacters(in: .whitespaces)] =
+                    String(parts[1]).trimmingCharacters(in: .whitespaces)
+            }
+        }
+        return result
+    }
+
+    /// Build a query string representation for HTMX URL parameters.
+    public var queryString: String {
+        var parts: [String] = []
+        if let ns = namespace { parts.append("namespace=\(ns)") }
+        if !labelSelectors.isEmpty {
+            let encoded = labelSelectors.map { "\($0.key)=\($0.value)" }.joined(separator: ",")
+            parts.append("labels=\(encoded)")
+        }
+        if let h = health { parts.append("health=\(h.rawValue)") }
+        if let n = nameContains { parts.append("search=\(n)") }
+        return parts.isEmpty ? "" : "?\(parts.joined(separator: "&"))"
+    }
+}
+
+/// Protocol for resources that can be filtered by ``ResourceFilter``.
+public protocol Filterable {
+    var name: String { get }
+    var namespace: String { get }
+    var labels: [String: String] { get }
+    var filterHealth: ResourceHealth? { get }
+}
+
+extension Filterable {
+    /// Returns true if this resource matches all criteria in the filter.
+    public func matches(_ filter: ResourceFilter) -> Bool {
+        if let ns = filter.namespace, namespace != ns { return false }
+        if let search = filter.nameContains, !search.isEmpty {
+            if !name.localizedCaseInsensitiveContains(search) { return false }
+        }
+        if let h = filter.health, filterHealth != h { return false }
+        for (key, value) in filter.labelSelectors {
+            if labels[key] != value { return false }
+        }
+        return true
+    }
+}
+
+// MARK: - Filterable Conformances
+
+extension PodInfo: Filterable {
+    public var filterHealth: ResourceHealth? { health }
+}
+
+extension DeploymentInfo: Filterable {
+    public var filterHealth: ResourceHealth? { health }
+}
+
+extension JobInfo: Filterable {
+    public var filterHealth: ResourceHealth? { health }
+}
+
+extension CronJobInfo: Filterable {
+    public var filterHealth: ResourceHealth? { health }
+}
+
+extension StatefulSetInfo: Filterable {
+    public var filterHealth: ResourceHealth? { health }
+}
+
+extension DaemonSetInfo: Filterable {
+    public var filterHealth: ResourceHealth? { health }
+}
+
+extension ServiceInfo: Filterable {
+    public var filterHealth: ResourceHealth? { nil }
+}
+
+extension IngressInfo: Filterable {
+    public var filterHealth: ResourceHealth? { nil }
+}
+
+extension ConfigMapInfo: Filterable {
+    public var labels: [String: String] { [:] }
+    public var filterHealth: ResourceHealth? { nil }
+}
+
+extension SecretInfo: Filterable {
+    public var labels: [String: String] { [:] }
+    public var filterHealth: ResourceHealth? { nil }
+}
+
+extension PVCInfo: Filterable {
+    public var labels: [String: String] { [:] }
+    public var filterHealth: ResourceHealth? { nil }
+}

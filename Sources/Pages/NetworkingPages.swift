@@ -10,19 +10,19 @@ import Models
 public struct ServiceListPage: HTML {
     let services: [ServiceInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(services: [ServiceInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(services: [ServiceInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.services = services
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "Services", currentPath: "/services") {
-            PageHeader(title: "Services", subtitle: "\(services.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/services/list")
-            }
+            PageHeader(title: "Services", subtitle: "\(services.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/services/list", showHealthFilter: false)
             div(.id("resource-list")) {
                 if services.isEmpty {
                     EmptyState("No services found")
@@ -66,19 +66,19 @@ public struct ServiceListPage: HTML {
 public struct IngressListPage: HTML {
     let ingresses: [IngressInfo]
     let namespaces: [NamespaceInfo]
-    let selectedNamespace: String?
+    let filter: ResourceFilter
 
-    public init(ingresses: [IngressInfo], namespaces: [NamespaceInfo], selectedNamespace: String? = nil) {
+    public init(ingresses: [IngressInfo], namespaces: [NamespaceInfo], filter: ResourceFilter = ResourceFilter()) {
         self.ingresses = ingresses
         self.namespaces = namespaces
-        self.selectedNamespace = selectedNamespace
+        self.filter = filter
     }
 
     public var body: some HTML {
         BaseLayout(title: "Ingresses", currentPath: "/ingresses") {
-            PageHeader(title: "Ingresses", subtitle: "\(ingresses.count) total") {
-                NamespaceFilter(namespaces: namespaces, selected: selectedNamespace, targetUrl: "/partials/ingresses/list")
-            }
+            PageHeader(title: "Ingresses", subtitle: "\(ingresses.count) total")
+
+            ResourceFilterBar(namespaces: namespaces, filter: filter, targetUrl: "/partials/ingresses/list", showHealthFilter: false)
             div(.id("resource-list")) {
                 if ingresses.isEmpty {
                     EmptyState("No ingresses found")
